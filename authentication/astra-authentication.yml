@@ -1,0 +1,42 @@
+generated: '2026-07-18'
+method: searched
+source: https://docs.astra.finance/reference/authorization
+docs: https://docs.astra.finance/reference/authorization
+summary:
+  types: [oauth2]
+  oauth2_flows: [authorizationCode, clientCredentials]
+  transport: https-only
+  token_header: "Authorization: Bearer <access_token>"
+notes: >-
+  All API requests must be made over HTTPS; plain HTTP and unauthenticated
+  requests fail. End-user money-movement operations are authorized with an
+  OAuth 2.0 access_token obtained by exchanging a temporary authorization_code;
+  administrative/client-level operations use client credentials
+  (client_id/client_secret issued from the Developer Dashboard). Astra also
+  documents "Trusted Authentication" and "API Only Authorization" onboarding
+  variants layered on the same OAuth model.
+schemes:
+- name: OAuth2 (user authorization)
+  type: oauth2
+  description: >-
+    Authorization Code flow. Present the user with Astra's OAuth module, receive
+    an authorization_code, then exchange it at the token endpoint for a Bearer
+    access_token used on that user's API requests.
+  flow: authorizationCode
+  token_endpoint: https://api.astra.finance/v1/oauth/token
+  authorization_url: https://app.astra.finance/login/oauth/authorize
+  source: https://docs.astra.finance/reference/authorization
+- name: Client Credentials (administrative)
+  type: oauth2
+  description: >-
+    Client-level authorization using the application's client_id and
+    client_secret for administrative endpoints that are not scoped to a single
+    end user.
+  flow: clientCredentials
+  source: https://docs.astra.finance/docs/api-only-authorization
+- name: Trusted Authentication
+  type: oauth2
+  description: >-
+    Enterprise onboarding variant for personal users offering the most
+    onboarding flexibility, built on the same OAuth authorization model.
+  source: https://docs.astra.finance/docs/trusted-authentication
