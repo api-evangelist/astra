@@ -1,0 +1,28 @@
+generated: '2026-07-18'
+method: searched
+source: https://docs.astra.finance/reference/introduction
+versioning:
+  scheme: uri-path
+  current: v1
+  detail: The Astra REST API is versioned in the path prefix (/v1).
+  docs: https://docs.astra.finance/reference/introduction
+environments:
+- name: production
+  api_base: https://api.astra.finance/v1
+  dashboard: https://dashboard.astra.finance/
+- name: sandbox
+  dashboard: https://dashboard-sandbox.astra.finance/
+deprecation:
+  policy_url: null
+  sunset_header: null
+  detail: No public deprecation policy or RFC 8594 Sunset/Deprecation header support was found.
+sla:
+  url: null
+  detail: No public SLA / uptime commitment page was found.
+status_page:
+  url: null
+  detail: No public status page was found at the time of enrichment.
+notes: >-
+  Only URI-path versioning (v1) is publicly documented. No status page,
+  deprecation policy, or SLA page was found, so no separate StatusPage /
+  Deprecation pointers are emitted (would require fabrication).

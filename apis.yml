@@ -1,7 +1,29 @@
 aid: astra
 name: Astra
-description: Astra is a company surfaced as a portfolio company of canaan-partners and added to the API
-  Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: >-
+  Astra (Astra Finance, Inc.) is a financial technology company providing an
+  all-in-one instant payments API that lets product teams embed real-time money
+  movement between bank accounts and debit cards. The platform powers instant
+  disbursements and payouts, instant account funding, accelerated bank
+  transfers, card-to-account movement, cross-border payments, and automated
+  "Routines," with built-in compliance, fraud detection, and chargeback
+  management. Developers integrate over a versioned REST API (v1) using OAuth
+  2.0 authorization for end-user money movement plus client-credential
+  authorization for administrative operations, with webhooks for asynchronous
+  updates and a full sandbox environment for testing.
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://astrafi.com/static/images/favicons/apple-touch-icon.png
 url: https://raw.githubusercontent.com/api-evangelist/astra/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -11,12 +33,100 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-18'
 tags:
 - Company
-apis: []
+- Payments
+- Fintech
+- Money Movement
+- ACH
+- Instant Payments
+- Bank Transfers
+- Disbursements
+- API
+apis:
+- name: Astra API
+  description: >-
+    Astra's REST API (v1) for embedding instant money movement — accounts,
+    users, cards, transfers, payment instruments, and Routines — authorized via
+    OAuth 2.0 and delivered with webhooks for asynchronous events.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Payments
+  - Money Movement
+  - ACH
+  properties:
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+common:
+- type: DomainSecurity
+  url: security/astra-domain-security.yml
+- type: DeveloperPortal
+  url: https://docs.astra.finance/
+- type: Documentation
+  url: https://docs.astra.finance/docs
+- type: APIReference
+  url: https://docs.astra.finance/reference/introduction
+- type: GettingStarted
+  url: https://docs.astra.finance/docs/getting-started
+- type: Blog
+  url: https://astrafi.com/blog/
+- type: Support
+  url: https://dashboard-sandbox.astra.finance/support
+- type: SignUp
+  url: https://dashboard-sandbox.astra.finance/login
+- type: Login
+  url: https://dashboard.astra.finance/
+- type: TermsOfService
+  url: https://astrafi.com/terms/
+- type: PrivacyPolicy
+  url: https://astrafi.com/privacy/
+- type: TrustCenter
+  url: https://trust.astrafi.com/
+- type: Compliance
+  url: https://astrafi.com/security-and-privacy/
+- type: LLMsTxt
+  url: llms/astra-llms.txt
+- type: Authentication
+  url: authentication/astra-authentication.yml
+- type: Conventions
+  url: conventions/astra-conventions.yml
+- type: ErrorCatalog
+  url: errors/astra-error-codes.yml
+- type: Webhooks
+  url: asyncapi/astra-webhooks.yml
+- type: Lifecycle
+  url: lifecycle/astra-lifecycle.yml
+- type: Sandbox
+  url: sandbox/astra-sandbox.yml
+- type: Conformance
+  url: conformance/astra-conformance.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

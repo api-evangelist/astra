@@ -1,0 +1,51 @@
+generated: '2026-07-18'
+method: searched
+source: https://docs.astra.finance/reference/introduction
+docs: https://docs.astra.finance/reference
+authentication:
+  style: oauth2-bearer
+  detail: >-
+    Bearer access_token in the Authorization header for user-scoped calls;
+    client credentials for administrative calls. See
+    authentication/astra-authentication.yml.
+transport:
+  https_required: true
+  detail: All API requests must be made over HTTPS; HTTP calls fail.
+versioning:
+  scheme: uri-path
+  current: v1
+  detail: API is versioned in the path prefix (/v1). See lifecycle/astra-lifecycle.yml.
+pagination:
+  documented: true
+  detail: >-
+    The API reference documents response pagination for list endpoints. Exact
+    parameter/field names are published in the reference and not restated here
+    to avoid drift.
+  docs: https://docs.astra.finance/reference
+idempotency:
+  request_idempotency_key: false
+  detail: >-
+    Astra does not document a request-level Idempotency-Key header. Webhook
+    CONSUMERS are advised to be idempotent because webhook delivery is
+    at-least-once and may arrive out of order; consumers should use object-level
+    timestamps to reconcile state. This is consumer-side idempotency, not a
+    request idempotency contract.
+  source: https://docs.astra.finance/reference/webhooks
+errors:
+  envelope: http-status
+  problem_json: false
+  detail: >-
+    Standard HTTP status codes signal success/failure (see
+    errors/astra-error-codes.yml). No RFC 9457 application/problem+json envelope
+    is documented.
+webhooks:
+  supported: true
+  detail: >-
+    Asynchronous updates delivered via webhooks configured per environment in
+    the Dashboard. See asyncapi/astra-webhooks.yml.
+rate_limiting:
+  documented: true
+  detail: >-
+    A "Security and Usage Limits" reference page documents usage limits; HTTP
+    429 is returned when limits are exceeded.
+  docs: https://docs.astra.finance/reference/security-and-usage-limits

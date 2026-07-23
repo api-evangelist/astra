@@ -1,0 +1,31 @@
+generated: '2026-07-18'
+method: searched
+probe: true
+url: https://trust.astrafi.com/
+source: https://astrafi.com/security-and-privacy/
+powered_by: Vanta
+certifications:
+- SOC 2
+- PCI DSS
+- GDPR
+- CCPA/CPRA
+practices:
+- Regular external audits including SOC, PCI, and vulnerability testing
+- Encryption of data at rest and in transit
+- Role-based access permissions audited monthly
+- Tokenization to obscure sensitive information
+- Change control and security testing in the development lifecycle
+- Automated backups and redundancy for critical capabilities
+- Vendor management and employee background checks
+- Security and privacy awareness training for staff
+evidence:
+- source: https://astrafi.com/security-and-privacy/
+  keywords: [soc 2, pci, gdpr, ccpa, vulnerability testing, encryption]
+- source: https://trust.astrafi.com/
+  keywords: [trust center, vanta]
+notes: >-
+  The Vanta-powered Trust Center (trust.astrafi.com) renders certification
+  detail via client-side JavaScript and is not machine-readable from static
+  HTML; certification names above are taken verbatim from the public
+  security-and-privacy page. "PCI DSS" is recorded as the framework Astra states
+  it is audited against ("SOC, PCI").

@@ -1,0 +1,36 @@
+generated: '2026-07-18'
+method: searched
+source: https://docs.astra.finance/docs/getting-started
+docs:
+- https://docs.astra.finance/docs/getting-started
+- https://docs.astra.finance/docs/testing-in-the-sandbox-environment
+model:
+  separation: environment
+  detail: >-
+    Astra provides a fully separate sandbox environment with its own Developer
+    Dashboard and its own client_id/client_secret. The sandbox API is reached at
+    different URLs than production; production money-movement calls follow the
+    same flow but against production hosts.
+environments:
+- name: sandbox
+  dashboard: https://dashboard-sandbox.astra.finance/
+  signup: https://dashboard-sandbox.astra.finance/login
+  detail: >-
+    Sign up, generate sandbox client_id/client_secret, create test user profiles
+    (UserIntents), and authorize a test user to obtain an access_token. In the
+    sandbox the OAuth module surfaces the authorization_code directly on the
+    web page so it can be copied for API requests.
+- name: production
+  dashboard: https://dashboard.astra.finance/
+  api_base: https://api.astra.finance/v1
+testing:
+  guide: https://docs.astra.finance/docs/testing-in-the-sandbox-environment
+  recipe: https://docs.astra.finance/v1.0/recipes/onboarding-a-new-user-1
+  detail: >-
+    Docs include a code-based onboarding recipe (Python) to create a user with
+    an access_token quickly against the sandbox.
+notes: >-
+  No published "magic" test values (test card numbers, test bank accounts, or
+  test IBANs) were found in the public sandbox docs, so none are recorded here
+  (recording any would require fabrication). Test data is generated per-account
+  via the sandbox Dashboard.

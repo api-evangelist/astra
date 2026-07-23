@@ -1,0 +1,39 @@
+generated: '2026-07-18'
+method: searched
+source: https://docs.astra.finance/reference/webhooks
+docs: https://docs.astra.finance/reference/webhooks
+spec_type: Webhooks
+summary: >-
+  Astra uses webhooks to send programmatic updates about a user's automations
+  and money movement. Webhooks are enabled per environment (sandbox / production)
+  in the Astra Dashboard under the Webhooks section. Endpoints must be HTTPS with
+  a valid SSL certificate.
+delivery:
+  guarantee: at-least-once
+  ordering: not-guaranteed
+  detail: >-
+    Delivery is best-effort with eventual consistency. An `_updated` webhook may
+    arrive before its related `_created` webhook; events may arrive out of order
+    or more than once. Consumers should be idempotent and use object-level
+    timestamps to reconcile state.
+  retries:
+    max_attempts: 10
+    request_timeout_seconds: 10
+    backoff: exponential (doubles after each failure)
+    retry_window: ~5 hours
+    detail: >-
+      On a non-200 response or no response Astra retries up to 10 times; each
+      retry reuses the same webhook_id as the initial delivery.
+event_families:
+- users
+- routines
+- transfers
+- batches
+- chargebacks
+- cards
+- payment_instruments
+notes: >-
+  Astra publishes a documented webhook catalog but no machine-readable AsyncAPI
+  document, so this artifact captures the webhook surface (type: Webhooks) rather
+  than a verbatim AsyncAPI spec. Individual event names/payloads are documented
+  per family in the reference and not restated here to avoid drift.
