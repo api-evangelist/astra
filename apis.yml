@@ -43,6 +43,15 @@ tags:
 - Instant Payments
 - Bank Transfers
 - Disbursements
+tags_raw:
+- Company
+- Payments
+- Fintech
+- Money Movement
+- ACH
+- Instant Payments
+- Bank Transfers
+- Disbursements
 - API
 apis:
 - name: Astra API
