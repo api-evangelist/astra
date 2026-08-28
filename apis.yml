@@ -11,6 +11,17 @@ description: >-
   2.0 authorization for end-user money movement plus client-credential
   authorization for administrative operations, with webhooks for asynchronous
   updates and a full sandbox environment for testing.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
