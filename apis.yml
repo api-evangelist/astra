@@ -1,16 +1,13 @@
 aid: astra
 name: Astra
-description: >-
-  Astra (Astra Finance, Inc.) is a financial technology company providing an
-  all-in-one instant payments API that lets product teams embed real-time money
-  movement between bank accounts and debit cards. The platform powers instant
-  disbursements and payouts, instant account funding, accelerated bank
-  transfers, card-to-account movement, cross-border payments, and automated
-  "Routines," with built-in compliance, fraud detection, and chargeback
-  management. Developers integrate over a versioned REST API (v1) using OAuth
-  2.0 authorization for end-user money movement plus client-credential
-  authorization for administrative operations, with webhooks for asynchronous
-  updates and a full sandbox environment for testing.
+description: Astra (Astra Finance, Inc.) is a financial technology company providing an all-in-one instant
+  payments API that lets product teams embed real-time money movement between bank accounts and debit
+  cards. The platform powers instant disbursements and payouts, instant account funding, accelerated bank
+  transfers, card-to-account movement, cross-border payments, and automated "Routines," with built-in
+  compliance, fraud detection, and chargeback management. Developers integrate over a versioned REST API
+  (v1) using OAuth 2.0 authorization for end-user money movement plus client-credential authorization
+  for administrative operations, with webhooks for asynchronous updates and a full sandbox environment
+  for testing.
 deliveryModel:
   model: saas
   open_source: false
@@ -44,7 +41,7 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.23'
 created: '2026-07-17'
-modified: '2026-07-18'
+modified: '2026-09-16'
 tags:
 - Company
 - Payments
@@ -66,10 +63,9 @@ tags_raw:
 - API
 apis:
 - name: Astra API
-  description: >-
-    Astra's REST API (v1) for embedding instant money movement — accounts,
-    users, cards, transfers, payment instruments, and Routines — authorized via
-    OAuth 2.0 and delivered with webhooks for asynchronous events.
+  description: Astra's REST API (v1) for embedding instant money movement — accounts, users, cards, transfers,
+    payment instruments, and Routines — authorized via OAuth 2.0 and delivered with webhooks for asynchronous
+    events.
   humanURL: https://docs.astra.finance/reference/introduction
   baseURL: https://api.astra.finance/v1
   tags:
@@ -98,6 +94,8 @@ apis:
   - type: Conformance
     url: conformance/astra-conformance.yml
 common:
+- type: Website
+  url: https://astra.finance
 - type: DomainSecurity
   url: security/astra-domain-security.yml
 - type: DeveloperPortal
