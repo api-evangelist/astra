@@ -1,0 +1,213 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-mcp-candidate.py
+source:
+- openapi/astra-developer-api-openapi.yml
+status: candidate
+deployment:
+  mode: none
+  auth: unknown
+  verified: derived
+note: No MCP server was found. No probe result in the dossier. Candidate tools below are derived from the 40 operation(s) in the provider's own
+  OpenAPI (40 listed); they describe what a server WOULD expose, not one that exists.
+tools:
+- name: get_v1_accounts
+  operationId: GET /v1/accounts
+  method: GET
+  path: /v1/accounts
+  description: List Accounts for a User
+- name: create_accounts_create
+  operationId: POST /v1/accounts/create
+  method: POST
+  path: /v1/accounts/create
+  description: Create Account by Account and Routing
+- name: create_accounts_processor_token
+  operationId: POST /v1/accounts/processor_token
+  method: POST
+  path: /v1/accounts/processor_token
+  description: Create Account by Plaid Processor Token
+- name: delete_v1_accounts
+  operationId: DELETE /v1/accounts/{id}
+  method: DELETE
+  path: /v1/accounts/{id}
+  description: Delete a Specific Account for a User
+- name: get_v1_batch_transfers
+  operationId: GET /v1/batch_transfers/{id}
+  method: GET
+  path: /v1/batch_transfers/{id}
+  description: Get a Specific Batch Transfer
+- name: get_v1_bins
+  operationId: GET /v1/bins/{bin}
+  method: GET
+  path: /v1/bins/{bin}
+  description: Get Card BIN Information
+- name: create_v1_business_profile
+  operationId: POST /v1/business_profile
+  method: POST
+  path: /v1/business_profile
+  description: Create a Business Profile for a business user
+- name: get_v1_business_profile
+  operationId: GET /v1/business_profile/{business_profile_id}
+  method: GET
+  path: /v1/business_profile/{business_profile_id}
+  description: Get a Business Profile
+- name: get_v1_cards
+  operationId: GET /v1/cards
+  method: GET
+  path: /v1/cards
+  description: List Cards for a User
+- name: create_v1_cards
+  operationId: POST /v1/cards
+  method: POST
+  path: /v1/cards
+  description: Create a Card for a User
+- name: delete_v1_cards
+  operationId: DELETE /v1/cards/{id}
+  method: DELETE
+  path: /v1/cards/{id}
+  description: Delete a Card
+- name: create_cards_approve
+  operationId: POST /v1/cards/{id}/approve
+  method: POST
+  path: /v1/cards/{id}/approve
+  description: Approve a Card by an ID
+- name: get_cards_auth_details
+  operationId: GET /v1/cards/{id}/auth_details
+  method: GET
+  path: /v1/cards/{id}/auth_details
+  description: Get Smart Card Authorization by Card ID
+- name: create_cards_reject
+  operationId: POST /v1/cards/{id}/reject
+  method: POST
+  path: /v1/cards/{id}/reject
+  description: Reject a Card by an ID
+- name: get_v1_instant-payment-eligibility
+  operationId: GET /v1/instant-payment-eligibility
+  method: GET
+  path: /v1/instant-payment-eligibility
+  description: Get Account Routing Number Instant Payment Eligibility
+- name: create_oauth_token
+  operationId: POST /v1/oauth/token
+  method: POST
+  path: /v1/oauth/token
+  description: Authorize a User
+- name: create_identity_token
+  operationId: POST /v1/partner/identity/token
+  method: POST
+  path: /v1/partner/identity/token
+  description: Authorize a User via API
+- name: create_identity_verification
+  operationId: POST /v1/partner/identity/verification
+  method: POST
+  path: /v1/partner/identity/verification
+  description: Generate a Partner Identity Verification Token
+- name: get_v1_payment_instruments
+  operationId: GET /v1/payment_instruments
+  method: GET
+  path: /v1/payment_instruments
+  description: List Payment Instruments for a Client
+- name: get_v1_phone_number_change_requests
+  operationId: GET /v1/phone_number_change_requests
+  method: GET
+  path: /v1/phone_number_change_requests
+  description: Get User Phone Number Change Requests
+- name: create_v1_request_address_change
+  operationId: POST /v1/request_address_change
+  method: POST
+  path: /v1/request_address_change
+  description: Request User Address Change
+- name: create_v1_request_user_phone_number_update
+  operationId: POST /v1/request_user_phone_number_update
+  method: POST
+  path: /v1/request_user_phone_number_update
+  description: Request User Phone Number Update
+- name: get_v1_routines
+  operationId: GET /v1/routines
+  method: GET
+  path: /v1/routines
+  description: List Routines for a User
+- name: create_v1_routines
+  operationId: POST /v1/routines
+  method: POST
+  path: /v1/routines
+  description: Create a new Routine
+- name: create_routines_account-to-card
+  operationId: POST /v1/routines/account-to-card
+  method: POST
+  path: /v1/routines/account-to-card
+  description: Create an account to card routine
+- name: create_routines_book
+  operationId: POST /v1/routines/book
+  method: POST
+  path: /v1/routines/book
+  description: Create a book transfer routine
+- name: create_routines_card-to-account
+  operationId: POST /v1/routines/card-to-account
+  method: POST
+  path: /v1/routines/card-to-account
+  description: Create a card to account routine
+- name: create_routines_preview
+  operationId: POST /v1/routines/preview
+  method: POST
+  path: /v1/routines/preview
+  description: Routine Preview
+- name: update_v1_routines
+  operationId: PUT /v1/routines/{id}
+  method: PUT
+  path: /v1/routines/{id}
+  description: Update an Existing Routine
+- name: delete_v1_routines
+  operationId: DELETE /v1/routines/{id}
+  method: DELETE
+  path: /v1/routines/{id}
+  description: Delete a Routine for a User
+- name: get_routines_transfers
+  operationId: GET /v1/routines/{id}/transfers
+  method: GET
+  path: /v1/routines/{id}/transfers
+  description: List Transfers for a Routine
+- name: get_v1_transfers
+  operationId: GET /v1/transfers
+  method: GET
+  path: /v1/transfers
+  description: List Transfers for a User
+- name: create_transfers_cancel
+  operationId: POST /v1/transfers/{id}/cancel
+  method: POST
+  path: /v1/transfers/{id}/cancel
+  description: Cancel Transfer
+- name: get_transfers_segments
+  operationId: GET /v1/transfers/{id}/segments
+  method: GET
+  path: /v1/transfers/{id}/segments
+  description: Get Details on the Segments of a Transfer
+- name: create_v1_upgrade_kyc_type
+  operationId: POST /v1/upgrade_kyc_type
+  method: POST
+  path: /v1/upgrade_kyc_type
+  description: Upgrade the kyc_type for a User
+- name: get_v1_user
+  operationId: GET /v1/user
+  method: GET
+  path: /v1/user
+  description: Get a User Profile
+- name: create_v1_user_intent
+  operationId: POST /v1/user_intent
+  method: POST
+  path: /v1/user_intent
+  description: Create a User Intent
+- name: get_v1_user_intent
+  operationId: GET /v1/user_intent/{id}
+  method: GET
+  path: /v1/user_intent/{id}
+  description: Get a User Intent
+- name: get_users_capabilities
+  operationId: GET /v1/users/{id}/capabilities
+  method: GET
+  path: /v1/users/{id}/capabilities
+  description: List Capabilities for a User
+- name: update_v1_users
+  operationId: PATCH /v1/users/{user_id}
+  method: PATCH
+  path: /v1/users/{user_id}
+  description: Update User Email

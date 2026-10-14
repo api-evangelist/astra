@@ -1,0 +1,84 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/astra-developer-api-openapi.yml
+vocabulary:
+  name: Astra Domain Vocabulary
+  description: 'Terms declared by Astra''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-14'
+  terms:
+  - term: oauth_error
+    definition: 'Object declared by the contract with fields: error.'
+    tags:
+    - Object
+    source: openapi/astra-developer-api-openapi.yml#/components/schemas/oauth_error
+  - term: oauth_error_description
+    definition: 'Object declared by the contract with fields: error, error_description.'
+    tags:
+    - Object
+    source: openapi/astra-developer-api-openapi.yml#/components/schemas/oauth_error_description
+  - term: oauth_success_response
+    definition: 'Object declared by the contract with fields: access_token, expires_in, refresh_token, token_type.'
+    tags:
+    - Object
+    source: openapi/astra-developer-api-openapi.yml#/components/schemas/oauth_success_response
+  - term: generic_error
+    definition: 'Object declared by the contract with fields: code, name, description.'
+    tags:
+    - Object
+    source: openapi/astra-developer-api-openapi.yml#/components/schemas/generic_error
+  - term: validation_error
+    definition: 'Object declared by the contract with fields: status_code, description.'
+    tags:
+    - Object
+    source: openapi/astra-developer-api-openapi.yml#/components/schemas/validation_error
+  - term: Accounts
+    definition: 'Resource group in the contract; its operation GET /v1/accounts: > 📘 > > You can place the bearer `access_token` for a specific
+      user into the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: Transfers
+    definition: 'Resource group in the contract; its operation GET /v1/batch_transfers/{id}: > 📘 > > You can place your application''s `client_id`
+      into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: Cards
+    definition: 'Resource group in the contract; its operation GET /v1/bins/{bin}: > 📘 > > You can place your application''s `client_id` into
+      the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: User
+    definition: 'Resource group in the contract; its operation POST /v1/business_profile: > 📘 > > You can place your application''s `client_id`
+      into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: Instant Payment Eligibility
+    definition: 'Resource group in the contract; its operation GET /v1/instant-payment-eligibility: > 📘 > > You can place your application''s
+      `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation
+      👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: Authorization
+    definition: 'Resource group in the contract; its operation POST /v1/oauth/token: > 📘 > > You can place your application''s `client_id` into
+      the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: Payment Instruments
+    definition: 'Resource group in the contract; its operation GET /v1/payment_instruments: > 📘 > > You can place your application''s `client_id`
+      into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml
+  - term: Routines
+    definition: 'Resource group in the contract; its operation GET /v1/routines: > 📘 > > You can place the bearer `access_token` for a specific
+      user into the Authentication section of this documentation 👉.'
+    tags:
+    - Resource Group
+    source: openapi/astra-developer-api-openapi.yml

@@ -1,0 +1,61 @@
+{
+  "@context": {
+    "@vocab": "https://astra.finance/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "astra": "https://astra.finance/schema#",
+    "oauth_error": "astra:oauth_error",
+    "error": {
+      "@id": "astra:error",
+      "@type": "xsd:string"
+    },
+    "oauth_error_description": "astra:oauth_error_description",
+    "error_description": {
+      "@id": "astra:error_description",
+      "@type": "xsd:string"
+    },
+    "oauth_success_response": "astra:oauth_success_response",
+    "access_token": {
+      "@id": "astra:access_token",
+      "@type": "xsd:string"
+    },
+    "expires_in": {
+      "@id": "astra:expires_in",
+      "@type": "xsd:integer"
+    },
+    "refresh_token": {
+      "@id": "astra:refresh_token",
+      "@type": "xsd:string"
+    },
+    "token_type": {
+      "@id": "astra:token_type",
+      "@type": "xsd:string"
+    },
+    "generic_error": "astra:generic_error",
+    "code": {
+      "@id": "astra:code",
+      "@type": "xsd:integer"
+    },
+    "name": {
+      "@id": "astra:name",
+      "@type": "xsd:string"
+    },
+    "description": {
+      "@id": "astra:description",
+      "@type": "xsd:string"
+    },
+    "validation_error": "astra:validation_error",
+    "status_code": {
+      "@id": "astra:status_code",
+      "@type": "xsd:integer"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Astra API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Astra's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-14) from openapi/astra-developer-api-openapi.yml.",
+  "dcterms:created": "2026-10-14",
+  "dcterms:source": [
+    "openapi/astra-developer-api-openapi.yml"
+  ]
+}

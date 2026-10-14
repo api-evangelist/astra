@@ -4,9 +4,7 @@ source: https://docs.astra.finance/reference
 standards:
 - id: oauth2
   conforms: true
-  evidence: >-
-    Authorization uses OAuth 2.0 authorization-code and client-credentials flows
-    with Bearer access_tokens (docs/reference/authorization).
+  evidence: Authorization uses OAuth 2.0 authorization-code and client-credentials flows with Bearer access_tokens (docs/reference/authorization).
 - id: tls-https-only
   conforms: true
   evidence: All API requests must be made over HTTPS; HTTP calls fail.
@@ -18,17 +16,25 @@ standards:
   evidence: Errors use plain HTTP status codes; no application/problem+json envelope documented.
 - id: soc2
   conforms: true
-  evidence: >-
-    Astra states it undergoes regular SOC audits (security-and-privacy page /
-    Vanta trust center). See security/astra-trust-center.yml.
+  evidence: Astra states it undergoes regular SOC audits (security-and-privacy page / Vanta trust center). See security/astra-trust-center.yml.
 - id: pci-dss
   conforms: true
-  evidence: >-
-    Astra states it undergoes PCI audits and vulnerability testing
-    (security-and-privacy page).
+  evidence: Astra states it undergoes PCI audits and vulnerability testing (security-and-privacy page).
 - id: gdpr
   conforms: true
   evidence: Listed on the public security-and-privacy page.
 - id: ccpa
   conforms: true
   evidence: Listed (CCPA/CPRA) on the public security-and-privacy page.
+- id: openapi-3.1
+  conforms: true
+  evidence: the document declares 3.1.0
+- id: rfc9457
+  conforms: false
+  evidence: no response declares application/problem+json
+- id: idempotency
+  conforms: true
+  evidence: Idempotency-Key declared on 4 of 24 mutating operations (partial)
+- id: pagination
+  conforms: true
+  evidence: list operations take cursor_id, page_size
