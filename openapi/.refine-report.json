@@ -1,0 +1,31 @@
+{
+  "provider": "astra",
+  "sources": [
+    "astra-developer-api-openapi.yml"
+  ],
+  "outputs": [
+    "astra-accounts-api-openapi.yml",
+    "astra-authorization-api-openapi.yml",
+    "astra-cards-api-openapi.yml",
+    "astra-instant-payment-eligibility-api-openapi.yml",
+    "astra-payment-instruments-api-openapi.yml",
+    "astra-routines-api-openapi.yml",
+    "astra-transfers-api-openapi.yml",
+    "astra-user-api-openapi.yml"
+  ],
+  "archived": [
+    "deleted 1 superseded output(s) from the previous generation"
+  ],
+  "errors": [],
+  "warnings": [
+    "astra-developer-api-openapi.yml: previously refined output kept for 45 operation(s) no archived document covers (e.g. /v1/accounts get, /v1/accounts/create post, /v1/accounts/processor_token post); its other 0 operation(s) came from the archive and were dropped from it. The archive is incomplete for this provider \u2014 re-harvest to restore _original/ as the full source of truth."
+  ],
+  "notes": [
+    "sourced from openapi/_original/ (0 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "astra-developer-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "astra-developer-api-openapi.yml: declared missing tag: Instant Payment Eligibility",
+    "superseded outputs removed: astra-developer-api-openapi.yml",
+    "apis.yml register: written (+8 apis, 8 total)"
+  ],
+  "skipped": []
+}

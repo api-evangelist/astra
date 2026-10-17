@@ -1,0 +1,1754 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer User API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: User
+paths:
+  /v1/business_profile:
+    post:
+      tags:
+      - User
+      summary: Create a Business Profile for a business user
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        This endpoint creates a business profile on behalf of the business user that will be used to pre-fill the business verification forms in the Astra OAuth flow.
+
+
+        > ❗️
+
+        >
+
+        > Note that there is a limit of 3 Business Profiles per phone number.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  description: 'Phone number of the business user (format: +15557771234). US numbers must be +1 followed by 10 digits. A non-US country code accepts + followed by 1 to 15 digits.'
+                  type: string
+                  pattern: ^\+\d{1,15}$
+                first_name:
+                  description: First name of the business user
+                  type: string
+                last_name:
+                  description: Last name of the business user
+                  type: string
+                email:
+                  description: Email of the business user
+                  type: string
+                user_id:
+                  description: The unique Astra user ID
+                  type: string
+                kyb_type:
+                  description: The verification type of the business user, which determines the user's capabilities to send and/or receive funds (defaults to verified if not specified)
+                  type: string
+                  enum:
+                  - verified
+                  - unverified
+                  - receive-only
+                business_info:
+                  schema: null
+                  type: object
+                  properties:
+                    business_name:
+                      description: The registered name of the business
+                      type: string
+                    business_type:
+                      description: The structure of the business
+                      type: string
+                      enum:
+                      - soleProprietorship
+                      - corporation
+                      - llc
+                      - nonprofit
+                      - partnership
+                    ein:
+                      description: The Employer Identification Number of the business -- Required if `business_type` is not "soleProprietorship" (XX-XXXXXXX)
+                      type: string
+                      pattern: ^\d{2}-\d{7}$
+                    doing_business_as:
+                      description: The preferred name of the business
+                      type: string
+                    phone:
+                      description: 'Phone number of the business (format: +15557771234). US numbers must be +1 followed by 10 digits. A non-US country code accepts + followed by 1 to 15 digits.'
+                      type: string
+                      pattern: ^\+\d{1,15}$
+                    address1:
+                      description: Address line 1 of the business address
+                      type: string
+                    address2:
+                      description: Address line 2 of the business address
+                      type: string
+                    city:
+                      description: The city of the business address
+                      type: string
+                    state:
+                      description: The US state of the business address
+                      type: string
+                    postal_code:
+                      description: The 5 digit postal code of the business address
+                      type: string
+                    website:
+                      description: The website of the business
+                      type: string
+                  required:
+                  - address1
+                  - business_classification
+                  - business_name
+                  - business_type
+                  - city
+                  - industry_classification
+                  - postal_code
+                  - state
+                business_admin:
+                  schema: null
+                  type: object
+                  properties:
+                    first_name:
+                      description: The legal first name of the business admin
+                      type: string
+                    last_name:
+                      description: The legal last name of the business admin
+                      type: string
+                    email:
+                      description: The email address of the business admin
+                      type: string
+                    date_of_birth:
+                      description: 'The date of birth of the business admin (format: YYYY-MM-DD) -- Required if `business_type` in `business_info` is "soleProprietorship")'
+                      type: string
+                      pattern: ^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$
+                    ssn:
+                      description: The last four digits of the business admin's Social Security Number -- Required if `business_type` in `business_info` is "soleProprietorship")
+                      type: string
+                    address1:
+                      description: Address line 1 of the business admin's address
+                      type: string
+                    address2:
+                      description: Address line 2 of the business admin's address
+                      type: string
+                    city:
+                      description: The city of the business admin's address
+                      type: string
+                    state:
+                      description: The US State of the business admin's address
+                      type: string
+                    postal_code:
+                      description: The 5 digit postal code of the business admin's address
+                      type: string
+                  required:
+                  - first_name
+                  - last_name
+                  - email
+                business_controller:
+                  description: Required if `business_type` in `business_info` is not "soleProprietorship"
+                  schema: null
+                  type: object
+                  properties:
+                    first_name:
+                      description: The legal first name of the business controller
+                      type: string
+                    last_name:
+                      description: The legal last name of the business controller
+                      type: string
+                    email:
+                      description: Email of the business user
+                      type: string
+                    title:
+                      description: The job title of the business controller
+                      type: string
+                    date_of_birth:
+                      description: 'The date of birth of the business controller (format: YYYY-MM-DD)'
+                      type: string
+                      pattern: ^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$
+                    ssn:
+                      description: The last four digits of the business controller's Social Security Number
+                      type: string
+                    address1:
+                      description: Address line 1 of the business controller's address
+                      type: string
+                    address2:
+                      description: Address line 2 of the business controller's address
+                      type: string
+                    city:
+                      description: The city of the business controller' address
+                      type: string
+                    state:
+                      description: The US State of the business controller's address
+                      type: string
+                    postal_code:
+                      description: The 5 digit postal code of the business controller's address
+                      type: string
+                  required:
+                  - first_name
+                  - last_name
+                  - email
+                  - title
+                  - date_of_birth
+                  - address1
+                  - city
+                  - state
+                  - postal_code
+                beneficial_owners:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      email:
+                        description: Email of the beneficial owner
+                        type: string
+                      first_name:
+                        description: First name of the beneficial owner
+                        type: string
+                        required: true
+                      last_name:
+                        description: Last name of the beneficial owner
+                        type: string
+                        required: true
+                      date_of_birth:
+                        description: 'Date of birth of the beneficial owner (format: YYYY-MM-DD)'
+                        type: string
+                        pattern: ^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$
+                      ssn:
+                        description: The last four digits of the beneficial owner's Social Security Number
+                        type: string
+                      address1:
+                        description: Address line 1 of the beneficial owner's address
+                        type: string
+                        required: true
+                      address2:
+                        description: Address line 2 of the beneficial owner's address
+                        type: string
+                      city:
+                        description: The city of the beneficial owner's address
+                        type: string
+                        required: true
+                      state:
+                        description: The US State of the beneficial owner's address
+                        type: string
+                        required: true
+                      postal_code:
+                        description: The 5 digit postal code of the beneficial owner's address
+                        type: string
+                        required: true
+              required:
+              - phone
+              - business_info
+              - business_admin
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: The unique ID for the business profile to be provided as a query param in the Astra SDK
+                    type: string
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validation_error'
+              examples:
+                missing_required_field:
+                  summary: Generic error for submitting a request without a required field
+                  value:
+                    status_code: 400
+                    description:
+                    - REQUIRED_FIELD_NAME: Missing data for required field.
+                phone_format:
+                  summary: Invalid Phone
+                  value:
+                    status_code: 400
+                    description:
+                      phone:
+                      - Phone number must be a US phone number in the format +12125559876.
+                phone_mismatch:
+                  summary: Phone does not match provided user
+                  value:
+                    status_code: 400
+                    description:
+                    - User is not associated with the provided phone number.
+                address1:
+                  summary: Address cannot be a PO Box
+                  value:
+                    status_code: 400
+                    description:
+                      address1:
+                      - Address must not be a Post Office Box.
+                state:
+                  summary: Invalid US State
+                  value:
+                    status_code: 400
+                    description:
+                      state:
+                      - State must be a two letter abbreviation.
+                postal_code:
+                  summary: Invalid Postal Code
+                  value:
+                    status_code: 400
+                    description:
+                      postal_code:
+                      - Postal code must be a five digit string.
+                ein:
+                  summary: Invalid EIN
+                  value:
+                    status_code: 400
+                    description:
+                      ein:
+                      - EIN must be 9 digits.
+                      - The provided employer identification number (EIN) is not valid.
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                user_not_authorized:
+                  summary: User has not authorized client
+                  value:
+                    code: 401
+                    name: Unauthorized
+                    description: '`user_id` 123456 has not authorized client.'
+      operationId: postV1BusinessProfile
+      x-operation-id-source: derived
+  /v1/business_profile/{business_profile_id}:
+    get:
+      tags:
+      - User
+      summary: Get a Business Profile
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        This endpoint retrieves the details of a Business Profile.'
+      security:
+      - basicAuth: []
+      parameters:
+      - name: business_profile_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Unique Astra Business Profile ID
+                    type: string
+                  first_name:
+                    description: First name of the business user
+                    type: string
+                  last_name:
+                    description: Last name of the business user
+                    type: string
+                  email:
+                    description: Email address of the business user
+                    type: string
+                  phone:
+                    description: Phone number of the business user
+                    type: string
+                  kyb_type:
+                    type: string
+                    description: The verification type of the business user, which determines the user's capabilities to send and/or receive funds
+                    enum:
+                    - receive-only
+                    - unverified
+                    - verified
+                  business_info:
+                    type: object
+                    properties:
+                      business_name:
+                        description: The registered name of the business
+                        type: string
+                      business_type:
+                        description: The structure of the business
+                        type: string
+                        enum:
+                        - soleProprietorship
+                        - corporation
+                        - llc
+                        - nonprofit
+                        - partnership
+                      ein:
+                        description: The Employer Identification Number of the business (XX-XXXXXXX)
+                        type: string
+                        pattern: ^\d{2}-\d{7}$
+                      doing_business_as:
+                        description: The preferred name of the business
+                        type: string
+                      phone:
+                        description: 'Phone number of the business (format: +15557771234)'
+                        type: string
+                        pattern: ^\+\d{11}$
+                      address1:
+                        description: Address line 1 of the business address
+                        type: string
+                      address2:
+                        description: Address line 2 of the business address
+                        type: string
+                      city:
+                        description: The city of the business address
+                        type: string
+                      state:
+                        description: The US state of the business address
+                        type: string
+                      postal_code:
+                        description: The 5 digit postal code of the business address
+                        type: string
+                      website:
+                        description: The website of the business
+                        type: string
+                  business_admin:
+                    type: object
+                    properties:
+                      first_name:
+                        description: The legal first name of the business admin
+                        type: string
+                      last_name:
+                        description: The legal last name of the business admin
+                        type: string
+                      email:
+                        description: The email address of the business admin
+                        type: string
+                      address1:
+                        description: Address line 1 of the business admin's address
+                        type: string
+                      address2:
+                        description: Address line 2 of the business admin's address
+                        type: string
+                      city:
+                        description: The city of the business admin's address
+                        type: string
+                      state:
+                        description: The US State of the business admin's address
+                        type: string
+                      postal_code:
+                        description: The 5 digit postal code of the business admin's address
+                        type: string
+                  business_controller:
+                    type: object
+                    properties:
+                      first_name:
+                        description: The legal first name of the business controller
+                        type: string
+                      last_name:
+                        description: The legal last name of the business controller
+                        type: string
+                      email:
+                        description: Email of the business user
+                        type: string
+                      title:
+                        description: The job title of the business controller
+                        type: string
+                      address1:
+                        description: Address line 1 of the business controller's address
+                        type: string
+                      address2:
+                        description: Address line 2 of the business controller's address
+                        type: string
+                      city:
+                        description: The city of the business controller' address
+                        type: string
+                      state:
+                        description: The US State of the business controller's address
+                        type: string
+                      postal_code:
+                        description: The 5 digit postal code of the business controller's address
+                        type: string
+      operationId: getV1BusinessProfileByBusinessProfileId
+      x-operation-id-source: derived
+  /v1/phone_number_change_requests:
+    get:
+      tags:
+      - User
+      summary: Get User Phone Number Change Requests
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint gives Astra''s customers the ability to retrieve phone change requests submitted on behalf of a user.'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  phone_number_change_requests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        created:
+                          type: string
+                          format: date-time
+                        completed:
+                          type: boolean
+                          description: Whether or not the phone change request has been fully processed
+                        completed_date:
+                          type: string
+                          format: date-time
+                          description: When the phone change request was fully processed
+                        current_phone:
+                          type: string
+                          description: The user's current phone number when the request was made
+                        proposed_phone:
+                          type: string
+                          description: The proposed new phone number for the user
+                        review_status:
+                          type: string
+                          description: The current review status for the phone change request
+                          enum:
+                          - approved
+                          - rejected
+                          - unreviewed
+                        review_date:
+                          type: string
+                          format: date-time
+                          description: The date the phone change request was reviewed
+                        user_id:
+                          type: string
+                          description: The unique ID of the user
+                  count:
+                    type: integer
+                    description: The number of phone number change requests returned
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1PhoneNumberChangeRequests
+      x-operation-id-source: derived
+  /v1/request_address_change:
+    post:
+      tags:
+      - User
+      summary: Request User Address Change
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        > 🚧
+
+        >
+
+        > Note: Do not pass empty strings or null values for properties. Instead, do not include the property in the payload.
+
+
+        > ❗️
+
+        >
+
+        > Note that only 2 address updates are allowed per User per 120 day period.
+
+
+        This endpoint will allow you to update the address of a User.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address1:
+                  type: string
+                  description: Address line 1 of the User (PO Boxes are not allowed)
+                address2:
+                  type: string
+                  description: Address line 2 of the User (PO Boxes are not allowed)
+                city:
+                  type: string
+                  description: City of the User
+                state:
+                  type: string
+                  description: State of the User's address
+                postal_code:
+                  type: string
+                  description: Postal code of the User
+                country:
+                  type: string
+                  description: Two-letter Country code of the User's address (defaults to US if not provided)
+              required:
+              - address1
+              - city
+              - state
+              - postal_code
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json: {}
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validation_error'
+              examples:
+                missing_required_field:
+                  summary: Missing Field Errors
+                  value:
+                    status_code: 400
+                    description:
+                    - street_line_1: Missing data for required field.
+                    - city: Missing data for required field.
+                    - state: Missing data for required field.
+                    - zip_code: Missing data for required field.
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                max_limit:
+                  summary: Max Address Changes
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: User has reached the maximum amount of address change requests.
+                invalid_country:
+                  summary: Invalid Country Code
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: Country code is not allowed for this client.
+      operationId: postV1RequestAddressChange
+      x-operation-id-source: derived
+  /v1/request_user_phone_number_update:
+    post:
+      tags:
+      - User
+      summary: Request User Phone Number Update
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint gives Astra''s customers the ability to submit a phone number change request on behalf of a User to Astra, which will be sent through security checks on our end. This ensures that we can safely and securely update a User''s phone number and verify that they are the owner.
+
+
+        > 📘
+
+        >
+
+        > Astra allows for a maximum of 1 phone change request to be performed every 30 days for each User. If a User''s phone number was updated on January 10, 2026, then the earliest the User''s phone number can be changed again is after February 9, 2026.
+
+
+        > 📘
+
+        >
+
+        > Phone number change requests can be rejected if our systems and our team are unable to verify phone ownership.
+
+
+        > 📘
+
+        >
+
+        > Phone number change requests are typically processed within one business day, but processing times may vary.
+
+
+        > ❗️
+
+        >
+
+        > Updating a User’s phone number does not update their UserIntent phone number. If a User’s Phone Number is successfully updated and if your program is leveraging Astra’s Web SDK, you’ll need to replace the user_intent_id query string parameter with the user_id query string parameter. In addition, including phone and phone_read_only query string parameters are highly recommended. Please ensure the phone number is derived from the User record, not the UserIntent record.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                proposed_phone:
+                  type: string
+                  description: The new phone number you would like to associate with the Astra User's profile
+                  example: '+15558675309'
+                  pattern: ^\+\d{11}$
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: postV1RequestUserPhoneNumberUpdate
+      x-operation-id-source: derived
+  /v1/upgrade_kyc_type:
+    post:
+      tags:
+      - User
+      summary: Upgrade the kyc_type for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        > ❗️
+
+        >
+
+        > This resource is only available to eligible programs. Please reach out to your Astra Integration specialist for more information.
+
+
+        > 🚧
+
+        >
+
+        > Users cannot be downgraded from `verified` to `receive-only`, `verified` to `unverified`, or from `unverified` to `receive-only`.
+
+
+        This endpoint upgrades the `kyc_type` for a Personal User from `unverified` or `receive-only` to the proposed `kyc_type`.
+
+
+        Valid upgrade paths include:
+
+        - `unverified` or `receive-only` to `verified`
+
+        - `receive-only` to `unverified`'
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kyc_type:
+                  type: string
+                  description: The proposed kyc_type for the User
+                  enum:
+                  - verified
+                  - unverified
+              required:
+              - kyc_type
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+      operationId: postV1UpgradeKycType
+      x-operation-id-source: derived
+  /v1/user:
+    get:
+      tags:
+      - User
+      summary: Get a User Profile
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint retrieves the profile information for the User whose `access_token` is passed in the authorization header.'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Unique Astra user ID
+                    type: string
+                  email:
+                    description: Email address of the user
+                    type: string
+                  phone:
+                    description: Phone number of the user
+                    type: string
+                  first_name:
+                    description: First name of the user
+                    type: string
+                  last_name:
+                    description: Last name of the user
+                    type: string
+                  preferred_first_name:
+                    description: Preferred first name of the user
+                    type: string
+                  preferred_last_name:
+                    description: Preferred last name of the user
+                    type: string
+                  preferred_pronouns:
+                    description: Preferred pronouns of the user
+                    type: string
+                  status:
+                    description: Current status of the user (Details on [User Statuses](https://docs.astra.finance/reference/user-statuses))
+                    type: string
+                    enum:
+                    - approved
+                    - pending
+                    - retry
+                    - document
+                    - suspended
+                    - rejected
+                  rejection_reasons:
+                    description: List of details on why a User is not approved
+                    type: array
+                  kyc_type:
+                    type: string
+                    description: The verification type of the user, which determines the user's capabilities to send and/or receive funds
+                    enum:
+                    - receive-only
+                    - unverified
+                    - verified
+                  metadata:
+                    type: object
+                    description: An optional metadata object for submitting custom data (during User Intent creation) that will be associated with the User Intent and the User
+                    properties:
+                      custom_field_name_1:
+                        type: string
+                        description: Supply a custom name for any number of fields, and provide it a custom value
+                      custom_field_name_2:
+                        type: string
+                        description: Supply a custom name for any number of fields, and provide it a custom value
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1User
+      x-operation-id-source: derived
+  /v1/user_intent:
+    post:
+      tags:
+      - User
+      summary: Create a User Intent
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        A User Intent manages the lifecycle of the creation of a User, before that User has been fully created. This endpoint creates a User Intent, starting the process of verifying the end-user''s identity in the background.
+
+
+        For managing UserIntents, Astra recommends that once a UserIntent is created, you should store that UserIntent ID with the User record. The UserIntent ID can then be sent as a query string parameter to the Astra OAuth flow. Once your application receives the `authorization_code`, you can make a call to the `GET /v1/user` endpoint which will give you a `user_id`.
+
+
+        > 📘
+
+        >
+
+        > For `receive-only` Users, the SSN and DOB fields become optional. For `unverified` Users, the SSN field becomes optional. For `verified Users`, SSN and DOB are required, unless your program is approved for KYC Delegation. If your program is approved for KYC delegation, the SSN field becomes optional.
+
+
+        > 🚧
+
+        >
+
+        > Note that a new UserIntent should only be created if an end-user is starting from scratch or had originally provided incorrect information.
+
+
+        > 🚧
+
+        >
+
+        > Note that if a UserIntent doesn''t have an address2 value, send Astra an empty string instead of a null or you''ll recieve a 400 response upon POSTing the request.
+
+
+        > ❗️
+
+        >
+
+        > Note that you may only attempt to create 3 UserIntents per email address. If you reach this limit while creating UserIntents in your Sandbox Environment, you will receive an error.
+
+
+        > ❗️
+
+        >
+
+        > The `ip_address` field is the IP address of the User’s device they are using to access our Platform. Submission of Private IP Addresses or VPNs can result in downgraded User capabilities or even a `rejected` UserIntent / User Profile.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email address of the user
+                phone:
+                  type: string
+                  description: 'Phone number of the user (format: +15557771234). US numbers must be +1 followed by 10 digits. A non-US country code accepts + followed by 1 to 15 digits.'
+                  pattern: ^\+\d{1,15}$
+                first_name:
+                  type: string
+                  description: First name of the user
+                last_name:
+                  type: string
+                  description: Last name of the user
+                preferred_first_name:
+                  type: string
+                  description: Preferred first name of the user
+                preferred_last_name:
+                  type: string
+                  description: Preferred last name of the user
+                preferred_pronouns:
+                  type: string
+                  description: Preferred pronouns of the user
+                address1:
+                  type: string
+                  description: Address line 1 of the user (PO Boxes are not allowed)
+                address2:
+                  type: string
+                  description: Address line 2 of the user (PO Boxes are not allowed)
+                city:
+                  type: string
+                  description: City of the user
+                state:
+                  type: string
+                  description: State of the user's address
+                postal_code:
+                  type: string
+                  description: Postal code of the user
+                date_of_birth:
+                  type: string
+                  description: 'Date of birth of the user (format: YYYY-MM-DD)'
+                  pattern: ^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$
+                ssn:
+                  type: string
+                  description: 'Social Security Number of the user (format: Last four ####). It is recommended that callers send only the last 4 digits. If a full 9 digit value is passed, Astra only stores the last 4 digits. Astra will remove support for full 9 digit social security numbers in the future.'
+                  pattern: ^(\d{4}|\d{9})$
+                ip_address:
+                  type: string
+                  description: IP address of the User's device they are using to access Astra's Platform
+                kyc_type:
+                  type: string
+                  description: The verification type of the user, which determines the user's capabilities to send and/or receive funds (will default to 'verified' if not provided)
+                  enum:
+                  - receive-only
+                  - unverified
+                  - verified
+                metadata:
+                  type: object
+                  description: 'An optional metadata object for submitting [custom metadata](https://docs.astra.finance/reference/custom-metadata) that will be associated with the User Intent and the User.
+
+
+                    Do not submit any sensitive information (bank account numbers, card details, PII, etc.) as metadata keys or values.
+
+
+                    metadata key: 1–64 chars, allowed chars set [a-zA-Z0-9_.-]
+
+
+                    metadata values: 1–256 chars
+
+
+                    Max keys: 25
+
+
+                    Recommended use case: Submitting a customer specific unique identifier (UUID format). Uniqueness not required.
+
+                    '
+                  additionalProperties: true
+              required:
+              - email
+              - phone
+              - first_name
+              - last_name
+              - address1
+              - city
+              - state
+              - postal_code
+              - date_of_birth
+              - ssn
+              - ip_address
+            examples:
+              approved:
+                summary: Example Approved User Intent
+                description: You can use the pre-filled fields from this example to result in a successful user intent.  Simply include a unique email address and a testable phone number.
+                value:
+                  first_name: Edmund
+                  last_name: Hillary
+                  date_of_birth: '1985-02-03'
+                  ssn: '1234'
+                  phone: YOUR_PHONE
+                  email: YOUR_EMAIL
+                  address1: 123 Astra Ave
+                  city: Palo Alto
+                  state: CA
+                  postal_code: '94304'
+                  ip_address: 192.0.2.0
+              rejected:
+                summary: Example Rejected User Intent
+                description: You can use the pre-filled fields from this example to result in a rejected user intent.
+                value:
+                  first_name: Edmund
+                  last_name: Hillary
+                  date_of_birth: '1970-01-01'
+                  ssn: '1234'
+                  phone: '+12025551111'
+                  email: YOUR_EMAIL
+                  address1: 123 Astra Ave
+                  city: Palo Alto
+                  state: CA
+                  postal_code: '94304'
+                  ip_address: 192.0.2.0
+              retry:
+                summary: Example Retry Status User Intent
+                description: You can use the pre-filled fields from this example to result in a user intent with a status of retry.  Simply include a unique email address and a testable phone number.
+                value:
+                  first_name: retry
+                  last_name: Hillary
+                  date_of_birth: '1985-02-03'
+                  ssn: '1234'
+                  phone: YOUR_PHONE
+                  email: YOUR_EMAIL
+                  address1: 123 Astra Ave
+                  city: Palo Alto
+                  state: CA
+                  postal_code: '94304'
+                  ip_address: 192.0.2.0
+              document:
+                summary: Example Document Status User Intent
+                description: You can use the pre-filled fields from this example to result in a user intent with a status of retry.  Simply include a unique email address and a testable phone number.
+                value:
+                  first_name: document
+                  last_name: Hillary
+                  date_of_birth: '1985-02-03'
+                  ssn: '1234'
+                  phone: YOUR_PHONE
+                  email: YOUR_EMAIL
+                  address1: 123 Astra Ave
+                  city: Palo Alto
+                  state: CA
+                  postal_code: '94304'
+                  ip_address: 192.0.2.0
+      security:
+      - basicAuth: []
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Unique Astra user intent ID
+                    type: string
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/validation_error'
+              examples:
+                max_intents:
+                  summary: Maximum User Intent Threshold
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: A maximum of 3 UserIntents can be created with the same e-mail address
+                missing_required_field:
+                  summary: Generic error for submitting a request without a required field
+                  value:
+                    status_code: 400
+                    description:
+                    - REQUIRED_FIELD_NAME: Missing data for required field.
+                po_box:
+                  summary: Cannot Use PO Box
+                  value:
+                    status_code: 400
+                    description:
+                      address1:
+                      - Address must not be a Post Office Box.
+                phone:
+                  summary: Invalid Phone
+                  value:
+                    status_code: 400
+                    description:
+                      phone:
+                      - Phone number must be a US phone number in the format +12125559876.
+                state:
+                  summary: Invalid US State
+                  value:
+                    status_code: 400
+                    description:
+                      state:
+                      - State must be a two letter abbreviation.
+                postal_code:
+                  summary: Invalid Postal Code
+                  value:
+                    status_code: 400
+                    description:
+                      postal_code:
+                      - Postal code must be a five digit string.
+                dob_format:
+                  summary: Invalid DOB Format
+                  value:
+                    status_code: 400
+                    description:
+                      date_of_birth:
+                      - Date of birth must be in the format YYYY-MM-DD.
+                dob_age_under:
+                  summary: Invalid Age (under allowed threshold)
+                  value:
+                    status_code: 400
+                    description:
+                      date_of_birth:
+                      - User must be at least eighteen years old.
+                dob_age_over:
+                  summary: Invalid Age (over allowed threshold)
+                  value:
+                    status_code: 400
+                    description:
+                      date_of_birth:
+                      - Invalid date of birth.
+                ssn:
+                  summary: Invalid SSN
+                  value:
+                    status_code: 400
+                    description:
+                      ssn:
+                      - SSN must be string of digits representing either the last four digits or full nine digits of the Social Security number. Dashes are not allowed.
+                ip:
+                  summary: Invalid IP
+                  value:
+                    status_code: 400
+                    description:
+                      ip_address:
+                      - Invalid IP address.
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    description: Response code
+                    type: integer
+                  name:
+                    description: Name of response code
+                    type: string
+                  description:
+                    description: Error message
+                    type: string
+              examples:
+                rejected:
+                  summary: Existing user that is rejected or suspended
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: A user with this email and phone number combination was screened by Astra and was not permitted on the platform
+                kyc_type:
+                  summary: Client is not enabled for the specified user intent kyc_type
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: Client is not enabled for receive-only `kyc_type`.
+      operationId: postV1UserIntent
+      x-operation-id-source: derived
+  /v1/user_intent/{id}:
+    get:
+      tags:
+      - User
+      summary: Get a User Intent
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        A User Intent manages the lifecycle of the creation of a User, before that User has been fully created. This endpoint retrieves the User Intent details.
+
+
+        > 📘
+
+        >
+
+        > Note that the `user_id` will be returned in the payload if the UserIntent has been successfully converted to a User. Also note that a UserIntent does not need to have an Approved Status to be converted to a User.'
+      security:
+      - basicAuth: []
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: User intent ID
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Unique Astra user intent ID
+                    type: string
+                  user_id:
+                    description: Unique Astra user ID
+                    type: string
+                  email:
+                    description: Email address of the user
+                    type: string
+                  phone:
+                    description: Phone number of the user
+                    type: string
+                  first_name:
+                    description: First name of the user
+                    type: string
+                  last_name:
+                    description: Last name of the user
+                    type: string
+                  preferred_first_name:
+                    description: Preferred first name of the user
+                    type: string
+                  preferred_last_name:
+                    description: Preferred last name of the user
+                    type: string
+                  preferred_pronouns:
+                    description: Preferred pronouns of the user
+                    type: string
+                  status:
+                    description: Current status of the user (Details on [User Statuses](https://docs.astra.finance/reference/user-statuses))
+                    type: string
+                    enum:
+                    - approved
+                    - pending
+                    - retry
+                    - document
+                    - suspended
+                    - rejected
+                    - converted_to_user
+                  rejection_reasons:
+                    description: List of details on why a User is not approved
+                    type: array
+                  kyc_type:
+                    type: string
+                    description: The verification type of the user, which determines the user's capabilities to send and/or receive funds
+                    enum:
+                    - receive-only
+                    - unverified
+                    - verified
+                  metadata:
+                    type: object
+                    description: An optional metadata object for submitting custom data (during User Intent creation) that will be associated with the User Intent and the User
+                    properties:
+                      custom_field_name_1:
+                        type: string
+                        description: Supply a custom name for any number of fields, and provide it a custom value
+                      custom_field_name_2:
+                        type: string
+                        description: Supply a custom name for any number of fields, and provide it a custom value
+      operationId: getV1UserIntentById
+      x-operation-id-source: derived
+  /v1/users/{id}/capabilities:
+    get:
+      tags:
+      - User
+      summary: List Capabilities for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint returns the current capabilities of a User.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: User ID
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  capabilities:
+                    description: The Capabilities object
+                    type: object
+                    properties:
+                      payments:
+                        description: The Payments object
+                        type: object
+                        properties:
+                          account_to_account:
+                            description: The Account-to-Account object
+                            type: object
+                            properties:
+                              limits:
+                                description: The limits array
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    description:
+                                      type: string
+                                      description: The description of the limit
+                                      enum:
+                                      - Maximum eligible settlement speed for account-to-account transfers.
+                                    property:
+                                      type: string
+                                      description: The property name
+                                      enum:
+                                      - max_settlement_speed
+                                    value:
+                                      type: string
+                                      description: Available values
+                                      enum:
+                                      - real-time
+                                      - T+0
+                                      - T+1
+                                      - T+2
+                                      - T+3
+                                      - T+4
+                          account_to_card:
+                            description: Phone number of the user
+                            type: object
+                            properties:
+                              gross_debit:
+                                description: null
+                                type: object
+                                properties:
+                                  limits:
+                                    description: The limits array
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        description:
+                                          type: string
+                                          description: The description of the limit
+                                          enum:
+                                          - Determines user eligibility for account-to-card gross debit transfers.
+                                        property:
+                                          type: string
+                                          description: The property name
+                                          enum:
+                                          - is_eligible
+                                        value:
+                                          type: boolean
+                                          description: true if the User is eligible, false if the User is not eligible
+                          card_to_card:
+                            description: Phone number of the user
+                            type: object
+                            properties:
+                              limits:
+                                description: The limits array
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    description:
+                                      type: string
+                                      description: The description of the limit
+                                      enum:
+                                      - Maximum number of daily transfers allowed for card-to-card transactions.
+                                    property:
+                                      type: string
+                                      description: The property name
+                                      enum:
+                                      - transfer_count_limit
+                                    frequency:
+                                      type: string
+                                      description: The time interval with which this limit is evaluated against (rolling window)
+                                      enum:
+                                      - daily
+                                    value:
+                                      type: string
+                                      description: null value correlates to no daily limit
+                                      enum:
+                                      - 'null'
+                                      - 1
+      operationId: getV1UsersByIdCapabilities
+      x-operation-id-source: derived
+  /v1/users/{user_id}:
+    patch:
+      tags:
+      - User
+      summary: Update User Email
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        > 🚧
+
+        >
+
+        > Note that a `user_updated` webhook will fire upon successful email update for a given User.
+
+
+        > 🚧
+
+        >
+
+        > Upon the third email change within a rolling 365 day window, the User''s capabilities will be automatically downgraded. Details on User Capabilities here'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: user_id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: User ID associated with the underlying `access_token` provided for authentication.  The email of this User ID associated with the `access_token` will be updated.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: The new email address for the User.  Must be a valid email format.
+              required:
+              - email
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Unique Astra user ID
+                    type: string
+                  email:
+                    description: Email address of the user
+                    type: string
+                  phone:
+                    description: Phone number of the user
+                    type: string
+                  first_name:
+                    description: First name of the user
+                    type: string
+                  last_name:
+                    description: Last name of the user
+                    type: string
+                  preferred_first_name:
+                    description: Preferred first name of the user
+                    type: string
+                  preferred_last_name:
+                    description: Preferred last name of the user
+                    type: string
+                  preferred_pronouns:
+                    description: Preferred pronouns of the user
+                    type: string
+                  status:
+                    description: Current status of the user (Details on [User Statuses](https://docs.astra.finance/reference/user-statuses))
+                    type: string
+                    enum:
+                    - approved
+                    - pending
+                    - retry
+                    - document
+                    - suspended
+                    - rejected
+                  rejection_reasons:
+                    description: List of details on why a User is not approved
+                    type: array
+                  kyc_type:
+                    type: string
+                    description: The verification type of the user, which determines the user's capabilities to send and/or receive funds
+                    enum:
+                    - receive-only
+                    - unverified
+                    - verified
+                  metadata:
+                    type: object
+                    description: An optional metadata object for submitting custom data (during User Intent creation) that will be associated with the User Intent and the User
+                    properties:
+                      custom_field_name_1:
+                        type: string
+                        description: Supply a custom name for any number of fields, and provide it a custom value
+                      custom_field_name_2:
+                        type: string
+                        description: Supply a custom name for any number of fields, and provide it a custom value
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                same_email:
+                  summary: The new email is the same as the current
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: The new email cannot be the same as the current email.
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '422':
+          description: Unprocessable Content
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  field_name:
+                    type: array
+                    description: Field validation failures return a per-field map
+              examples:
+                invalid_email:
+                  summary: Email format is invalid.
+                  value:
+                    email:
+                    - Not a valid email address.
+      operationId: patchV1UsersByUserId
+      x-operation-id-source: derived
+components:
+  examples:
+    generic_error_unauthorized:
+      summary: Invalid or Expired Access Token
+      value:
+        code: 401
+        name: Unauthorized
+        description: null
+  schemas:
+    validation_error:
+      type: object
+      properties:
+        status_code:
+          description: HTTP Response code
+          type: integer
+        description:
+          description: Object of invalid fields with accompanying descriptions
+          type: object
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

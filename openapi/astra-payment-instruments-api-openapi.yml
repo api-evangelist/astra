@@ -1,0 +1,436 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Payment Instruments API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Payment Instruments
+paths:
+  /v1/payment_instruments:
+    get:
+      tags:
+      - Payment Instruments
+      summary: List Payment Instruments for a Client
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        > 🚧
+
+        >
+
+        > Payment Instruments are required for Real-Time (FedNow, RTP) and T+0 Same Day ACH payment flows. Please reach out to your Astra Integration Specialist for more information.
+
+
+        > 🚧
+
+        >
+
+        > There may be up to a 5 minute delay in calculating the true available balance of a payment instrument.
+
+
+        Retrieves all Payment Instruments for a Client.'
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment_instruments:
+                    type: array
+                    items:
+                      schema: null
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique ID of the Payment Instrument
+                        name:
+                          type: string
+                          description: The Payment Instrument name
+                        account_number:
+                          type: string
+                          description: The account number (Note - Astra-internal operational account numbers will be redacted)
+                        mask:
+                          type: string
+                          description: The account mask
+                        routing_number:
+                          type: string
+                          description: The routing number (Note - Astra-internal operational routing numbers will be redacted)
+                        available_balance:
+                          type: object
+                          description: The available balance of the account
+                          properties:
+                            amount:
+                              type: integer
+                              description: The amount in cents
+                            currency:
+                              type: string
+                              description: The currency type
+                              enum:
+                              - USD
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: The date and time when the balance was last updated (UTC)
+                        current_balance:
+                          type: object
+                          description: The current balance of the account
+                          properties:
+                            amount:
+                              type: integer
+                              description: The amount in cents
+                            currency:
+                              type: string
+                              description: The currency type
+                              enum:
+                              - USD
+                            updated_at:
+                              type: string
+                              format: date-time
+                              description: The date and time when the balance was last updated (UTC)
+                        created_at:
+                          type: string
+                          format: date-time
+                          description: The date and time when the Payment Instrument was created (UTC)
+                        principal:
+                          type: object
+                          description: The principal of the account
+                          properties:
+                            first_name:
+                              type: string
+                              description: The first name of the principal
+                            last_name:
+                              type: string
+                              description: The last name of the principal
+                            type:
+                              type: string
+                              description: The principal type
+                              enum:
+                              - individual
+                              - business
+                              - other
+                        program_role:
+                          type: string
+                          description: The program role
+                          enum:
+                          - fee
+                          - program
+                          - settlement
+                          - suspense
+                          - reserve
+                        status:
+                          type: string
+                          description: The status of the Payment Instrument
+                          enum:
+                          - approved
+                          - created
+                          - closed
+                          - inactive
+                          - pending_review
+                          - rejected
+                          - suspended
+                        type:
+                          type: string
+                          description: The account type
+                          enum:
+                          - depository
+                        sub_type:
+                          type: string
+                          description: The account subtype
+                          enum:
+                          - checking
+                          - savings
+                        updated_at:
+                          type: string
+                          format: date-time
+                          description: The date and time the Payment Instrument was last updated (UTC)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1PaymentInstruments
+      x-operation-id-source: derived
+  /v1/payment_instruments/{id}:
+    get:
+      tags:
+      - Payment Instruments
+      summary: Get Payment Instrument by an ID
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        > 🚧
+
+        >
+
+        > Payment Instruments are required for Real-Time (FedNow, RTP) and T+0 Same Day ACH payment flows. Please reach out to your Astra Integration Specialist for more information.
+
+
+        > 🚧
+
+        >
+
+        > There may be up to a 5 minute delay in calculating the true available balance of a payment instrument.
+
+
+        Retrieves a specific Payment Instrument for a Client.'
+      security:
+      - basicAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The Payment Instrument ID
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Payment Instrument
+                  name:
+                    type: string
+                    description: The Payment Instrument name
+                  account_number:
+                    type: string
+                    description: The account number (Note - Astra-internal operational account numbers will be redacted)
+                  mask:
+                    type: string
+                    description: The account mask
+                  routing_number:
+                    type: string
+                    description: The routing number (Note - Astra-internal operational routing numbers will be redacted)
+                  available_balance:
+                    type: object
+                    description: The available balance of the account
+                    properties:
+                      amount:
+                        type: integer
+                        description: The amount in cents
+                      currency:
+                        type: string
+                        description: The currency type
+                        enum:
+                        - USD
+                      updated_at:
+                        type: string
+                        format: date-time
+                        description: The date and time when the balance was last updated (UTC)
+                  current_balance:
+                    type: object
+                    description: The current balance of the account
+                    properties:
+                      amount:
+                        type: integer
+                        description: The amount in cents
+                      currency:
+                        type: string
+                        description: The currency type
+                        enum:
+                        - USD
+                      updated_at:
+                        type: string
+                        format: date-time
+                        description: The date and time when the balance was last updated (UTC)
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: The date and time when the Payment Instrument was created (UTC)
+                  principal:
+                    type: object
+                    description: The principal of the account
+                    properties:
+                      first_name:
+                        type: string
+                        description: The first name of the principal
+                      last_name:
+                        type: string
+                        description: The last name of the principal
+                      type:
+                        type: string
+                        description: The principal type
+                        enum:
+                        - individual
+                        - business
+                        - other
+                  program_role:
+                    type: string
+                    description: The program role
+                    enum:
+                    - fee
+                    - program
+                    - settlement
+                    - suspense
+                    - reserve
+                  status:
+                    type: string
+                    description: The status of the Payment Instrument
+                    enum:
+                    - approved
+                    - created
+                    - closed
+                    - inactive
+                    - pending_review
+                    - rejected
+                    - suspended
+                  type:
+                    type: string
+                    description: The account type
+                    enum:
+                    - depository
+                  sub_type:
+                    type: string
+                    description: The account subtype
+                    enum:
+                    - checking
+                    - savings
+                  updated_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the Payment Instrument was last updated (UTC)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '404':
+          description: Not Found
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json: {}
+      operationId: getV1PaymentInstrumentsById
+      x-operation-id-source: derived
+components:
+  examples:
+    generic_error_unauthorized:
+      summary: Invalid or Expired Access Token
+      value:
+        code: 401
+        name: Unauthorized
+        description: null
+  schemas:
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

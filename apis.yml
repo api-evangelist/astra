@@ -157,18 +157,16 @@ common:
   url: conformance/astra-conformance.yml
 
 apis:
-- name: Astra API
-  description: Astra's REST API (v1) for embedding instant money movement — accounts, users, cards, transfers, payment instruments, and Routines
-    — authorized via OAuth 2.0 and delivered with webhooks for asynchronous events.
+- aid: astra:astra-accounts-api
+  name: Astra Accounts API
+  description: The Accounts API from Astra — 4 operation(s) for accounts.
   humanURL: https://docs.astra.finance/reference/introduction
   baseURL: https://api.astra.finance/v1
   tags:
-  - Payments
-  - Money Movement
-  - ACH
+  - Accounts
   properties:
-  - url: openapi/astra-developer-api-openapi.yml
-    type: OpenAPI
+  - type: OpenAPI
+    url: openapi/astra-accounts-api-openapi.yml
   - type: Documentation
     url: https://docs.astra.finance/docs
   - type: APIReference
@@ -191,8 +189,231 @@ apis:
     url: conformance/astra-conformance.yml
   - type: JSONSchema
     url: json-schema/astra-oauth-success-response-schema.json
-  aid: astra:astra-api
-
+- aid: astra:astra-authorization-api
+  name: Astra Authorization API
+  description: The Authorization API from Astra — 3 operation(s) for authorization.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Authorization
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-authorization-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
+- aid: astra:astra-cards-api
+  name: Astra Cards API
+  description: The Cards API from Astra — 6 operation(s) for cards.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Cards
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-cards-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
+- aid: astra:astra-instant-payment-eligibility-api
+  name: Astra Instant Payment Eligibility API
+  description: >-
+    The Instant Payment Eligibility API from Astra — 1 operation(s) for instant payment eligibility.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Instant Payment Eligibility
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-instant-payment-eligibility-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
+- aid: astra:astra-payment-instruments-api
+  name: Astra Payment Instruments API
+  description: The Payment Instruments API from Astra — 2 operation(s) for payment instruments.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Payment Instruments
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-payment-instruments-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
+- aid: astra:astra-routines-api
+  name: Astra Routines API
+  description: The Routines API from Astra — 7 operation(s) for routines.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Routines
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-routines-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
+- aid: astra:astra-transfers-api
+  name: Astra Transfers API
+  description: The Transfers API from Astra — 5 operation(s) for transfers.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - Transfers
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-transfers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
+- aid: astra:astra-user-api
+  name: Astra User API
+  description: The User API from Astra — 11 operation(s) for user.
+  humanURL: https://docs.astra.finance/reference/introduction
+  baseURL: https://api.astra.finance/v1
+  tags:
+  - User
+  properties:
+  - type: OpenAPI
+    url: openapi/astra-user-api-openapi.yml
+  - type: Documentation
+    url: https://docs.astra.finance/docs
+  - type: APIReference
+    url: https://docs.astra.finance/reference/introduction
+  - type: GettingStarted
+    url: https://docs.astra.finance/docs/getting-started
+  - type: Authentication
+    url: authentication/astra-authentication.yml
+  - type: Conventions
+    url: conventions/astra-conventions.yml
+  - type: ErrorCatalog
+    url: errors/astra-error-codes.yml
+  - type: Webhooks
+    url: asyncapi/astra-webhooks.yml
+  - type: Lifecycle
+    url: lifecycle/astra-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/astra-sandbox.yml
+  - type: Conformance
+    url: conformance/astra-conformance.yml
+  - type: JSONSchema
+    url: json-schema/astra-oauth-success-response-schema.json
 x-enrichment:
   date: '2026-07-19'
   status: backfilled

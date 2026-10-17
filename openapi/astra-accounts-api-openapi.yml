@@ -1,0 +1,704 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Accounts API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Accounts
+paths:
+  /v1/accounts:
+    get:
+      tags:
+      - Accounts
+      summary: List Accounts for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Retrieve all Accounts for a User.
+
+
+        > 📘
+
+        >
+
+        > This resource returns paginated results in descending order. For more details please see: Pagination'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page_size
+        in: query
+        description: The maximum number of items returned with each request.  Defaults to 25 if not specified.
+        schema:
+          type: integer
+          minimum: 10
+          maximum: 100
+        required: false
+      - name: cursor_id
+        in: query
+        description: The pagination cursor ID.  When specified, allows one to navigate between pages.  If not specified the first page of results will be returned.
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The number of accounts returned
+                  accounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique ID of the Account
+                        status:
+                          type: string
+                          description: The status of the underlying account. Only accounts with a status of approved can be used in routines.
+                          enum:
+                          - approved
+                          - rejected
+                          - unreviewed
+                        removed:
+                          type: boolean
+                          description: Value of true if the account has been deleted/removed.
+                        official_name:
+                          type: string
+                          description: The official name of the Account from the Institution
+                        name:
+                          type: string
+                          description: The name of the Account from the Institution
+                        nickname:
+                          type: string
+                          description: The name of the Account defined by the User
+                        mask:
+                          type: string
+                          description: The last four digits of the Account number
+                        institution_name:
+                          type: string
+                          description: The name of the Institution where the Account is held
+                        institution_logo:
+                          type: string
+                          description: The Institution logo in base64 format
+                        type:
+                          type: string
+                          description: The category of the Account type (ie. depository)
+                        subtype:
+                          type: string
+                          description: The sub category of the Account type (ie. checking)
+                        current_balance:
+                          type: number
+                          format: float
+                          description: The value of the current balance for the Account
+                        available_balance:
+                          type: number
+                          format: float
+                          description: The value of the available balance for the Account
+                        last_balance_update_on:
+                          type: date
+                          description: The last update for the Account object from the Institution
+                        connection_status:
+                          type: string
+                          description: The current status of the account (connected or error)
+                    required: []
+                  next_cursor_id:
+                    type: string
+                    description: The next cursor ID, for resuming a paginated query
+                  has_next_page:
+                    type: boolean
+                    description: Whether the paginated query has additional pages (value may be null if no there are no additional pages)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1Accounts
+      x-operation-id-source: derived
+  /v1/accounts/create:
+    post:
+      tags:
+      - Accounts
+      summary: Create Account by Account and Routing
+      servers:
+      - url: https://secure.api-sandbox.astra.finance
+        description: Secure Sandbox URL
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint will create an Account for a User based on an account and routing number.
+
+
+        > ❗️ This resource requires the use of the secure endpoint.
+
+        >
+
+        > | Environment | Secure Endpoint |
+
+        > |-------------|-------------------------------------------------------------|
+
+        > | Production | https://secure.api.astra.finance/v1/accounts/create |
+
+        > | Sandbox | https://secure.api-sandbox.astra.finance/v1/accounts/create |
+
+
+        > 🚧
+
+        >
+
+        > Your Institution ID in Sandbox may be different than your Institution ID in Production. Please check the Client Details section of your Astra Dashboard to confirm.
+
+
+        > 🚧
+
+        >
+
+        > If you are creating an account in Sandbox, the Routing number must be a real-world Routing number. Account numbers in Sandbox should not be real-world. If you do not have a Routing number readily available, you can use `222222226`.
+
+
+        > 🚧
+
+        >
+
+        > Account numbers must be at minimum 7 digits and no greater than 17. For account numbers less than 7 digits, you must prepend zeros to the beginning of the account number. For example: an account number of `12345` should be registered as `0012345`.
+
+
+        > 📘
+
+        >
+
+        > Although required, the `Name` field is internal facing, and isn’t available for your Users to see unless you explicitly make this field visible to them through your application. The `Name` field also doesn’t appear on Bank Statements. This field was primarily designed for internal tracking of accounts.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                institution_id:
+                  type: string
+                  description: The Institution ID given to you by Astra, which can be found in the Client Details section of your Astra Dashboard
+                name:
+                  type: string
+                  description: The name for the Account
+                bank_account_type:
+                  type: string
+                  description: The type of bank account (checking or savings)
+                account_number:
+                  type: string
+                  description: The bank account number
+                routing_number:
+                  type: string
+                  description: The bank routing number
+              required:
+              - institution_id
+              - name
+              - bank_account_type
+              - account_number
+              - routing_number
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique ID of the account
+                  official_name:
+                    type: string
+                    description: Official name of the account
+                  name:
+                    type: string
+                    description: Name of the account
+                  mask:
+                    type: string
+                    description: Masked account number
+                  institution_name:
+                    type: string
+                    description: Institution name of the account
+                  institution_logo:
+                    type: string
+                    description: Logo of the institution
+                  type:
+                    type: string
+                    description: Type of the account
+                  subtype:
+                    type: string
+                    description: Subtype of the account
+                  connection_status:
+                    type: string
+                    description: Connection status of the account
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/validation_error'
+              examples:
+                existing_routing_account:
+                  summary: Existing Account
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: A bank account with this routing number and account number has already been created.
+                bank_account_type:
+                  summary: Invalid Bank Account Type
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Bank account type must be either 'checking' or 'savings'.
+                institution:
+                  summary: Invalid Institution ID
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Please contact support for Institution INSTITUTION_ID.
+                create_account_failed:
+                  summary: Account Creation Failed
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Account creation failed. Please contact support.
+                account_number:
+                  summary: Invalid Account Number
+                  value:
+                    status_code: 400
+                    description:
+                    - account_number: Account number may not be greater than 17 characters in length
+                routing_number:
+                  summary: Invalid Routing Number
+                  value:
+                    status_code: 400
+                    description:
+                    - routing_number: Routing number must be nine characters in length
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                institution_not_allowed:
+                  summary: Unauthorized Institution ID
+                  value:
+                    code: 401
+                    name: Unauthorized
+                    description: Not permitted to create accounts for Institution INSTITUTION_ID.
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: postV1AccountsCreate
+      x-operation-id-source: derived
+  /v1/accounts/processor_token:
+    post:
+      tags:
+      - Accounts
+      summary: Create Account by Plaid Processor Token
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Astra and Plaid have partnered to enable you to use your existing Plaid integration to connect bank accounts and leverage Astra''s transfer automation capabilities.
+
+
+        To get started, follow the guide from Plaid''s API docs. Completing the process will result in the creation of a `processor_token`.
+
+
+        Sending the `processor_token` to this endpoint will create an Account for a User within the Astra platform. You can then easily use the resulting account `id` as the source or destination of a transfer Routine.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processor_token:
+                  type: string
+                  description: The `processor_token` received when exchanged for an `access_token` via Plaid's API
+                institution_id:
+                  type: string
+                  description: The `institution_id` for your Plaid `access_token` used for a fallback association to the correct institution.
+              required:
+              - processor_token
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Account ID
+                  institution_id:
+                    type: string
+                    description: Your Plaid access token institution_id
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/embedded_plaid_error'
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                plaid_auth:
+                  summary: Error Fetching Plaid Auth Token
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Something went wrong while fetching Plaid Auth data with the supplied processor token.
+                    embedded_error: PLAID_ERROR_OBJECT
+                account_exists:
+                  summary: Account Exists
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Account already exists.
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                client_requires_config:
+                  summary: Client Requires Configuration
+                  value:
+                    code: 401
+                    name: Unauthorized
+                    description: Processor token functionality requires manual configuration by an Astra administrator.
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '503':
+          description: Service Unavailable
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                auth_data_not_returned:
+                  summary: Auth Data Not Returned
+                  value:
+                    code: 503
+                    name: Service Unavailable
+                    description: Something went wrong while fetching Plaid Auth data with the supplied processor token.
+                network_error:
+                  summary: Network Error
+                  value:
+                    code: 503
+                    name: Service Unavailable
+                    description: Network error occurred while fetching Plaid Auth data.
+                no_account_id:
+                  summary: Account ID Missing
+                  value:
+                    code: 503
+                    name: Service Unavailable
+                    description: No account_id found in the Plaid response.
+                no_routing_number:
+                  summary: Routing Number Missing
+                  value:
+                    code: 503
+                    name: Service Unavailable
+                    description: No routing number found in the Plaid response.
+      operationId: postV1AccountsProcessorToken
+      x-operation-id-source: derived
+  /v1/accounts/{id}:
+    get:
+      tags:
+      - Accounts
+      summary: Get a Specific Account for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint retrieves a specific Account for a User based on the Account ID.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of the Account
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Account
+                  status:
+                    type: string
+                    description: The status of the underlying account. Only accounts with a status of approved can be used in routines.
+                    enum:
+                    - approved
+                    - rejected
+                    - unreviewed
+                  removed:
+                    type: boolean
+                    description: Value of true if the account has been deleted/removed.
+                  official_name:
+                    type: string
+                    description: The official name of the Account from the Institution
+                  name:
+                    type: string
+                    description: The name of the Account from the Institution
+                  nickname:
+                    type: string
+                    description: The name of the Account defined by the User
+                  mask:
+                    type: string
+                    description: The last four digits of the Account number
+                  institution_name:
+                    type: string
+                    description: The name of the Institution where the Account is held
+                  institution_logo:
+                    type: string
+                    description: The Institution logo in base64 format
+                  type:
+                    type: string
+                    description: The category of the Account type (ie. depository)
+                  subtype:
+                    type: string
+                    description: The sub category of the Account type (ie. checking)
+                  current_balance:
+                    type: number
+                    format: float
+                    description: The value of the current balance for the Account
+                  available_balance:
+                    type: number
+                    format: float
+                    description: The value of the available balance for the Account
+                  last_balance_update_on:
+                    type: date
+                    description: The last update for the Account object from the Institution
+                  connection_status:
+                    type: string
+                    description: The current status of the account (connected or error)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1AccountsById
+      x-operation-id-source: derived
+    delete:
+      tags:
+      - Accounts
+      summary: Delete a Specific Account for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint deletes a specific account for a User based on the account ID. The Response will only include a Response Code.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: The ID of the specific account to delete.
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: deleteV1AccountsById
+      x-operation-id-source: derived
+components:
+  examples:
+    generic_error_unauthorized:
+      summary: Invalid or Expired Access Token
+      value:
+        code: 401
+        name: Unauthorized
+        description: null
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  schemas:
+    embedded_plaid_error:
+      allOf:
+      - $ref: '#/components/schemas/generic_error'
+      - type: object
+        properties:
+          embedded_error:
+            description: Plaid error with [schema](https://plaid.com/docs/errors/#error-schema)
+            type: object
+    validation_error:
+      type: object
+      properties:
+        status_code:
+          description: HTTP Response code
+          type: integer
+        description:
+          description: Object of invalid fields with accompanying descriptions
+          type: object
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

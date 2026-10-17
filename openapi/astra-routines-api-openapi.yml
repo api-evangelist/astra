@@ -1,0 +1,2026 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Routines API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Routines
+paths:
+  /v1/routines:
+    get:
+      tags:
+      - Routines
+      summary: List Routines for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Retrieve all Routines for a User.
+
+
+        > 📘
+
+        >
+
+        > This resource returns paginated results in descending order. For more details please see: Pagination'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page_size
+        in: query
+        description: The maximum number of items returned with each request.  Defaults to 25 if not specified.
+        schema:
+          type: integer
+          minimum: 10
+          maximum: 100
+        required: false
+      - name: cursor_id
+        in: query
+        description: The pagination cursor ID.  When specified, allows one to navigate between pages.  If not specified the first page of results will be returned.
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The number of routines returned
+                  routines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique ID of the Routine
+                        type:
+                          type: string
+                          description: The type of Routine
+                          enum:
+                          - one-time
+                          - recurring
+                        name:
+                          type: string
+                          description: The name given for the Routine
+                        payment_type:
+                          type: string
+                          description: The type of payment
+                          enum:
+                          - ach
+                          - debit
+                          - ledger
+                        source_id:
+                          type: string
+                          description: The ID of the Source Account
+                        destination_id:
+                          type: string
+                          description: The ID of the Destination Account
+                        destination_user_id:
+                          type: string
+                          description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                        amount:
+                          type: number
+                          format: float
+                          description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                        start_date:
+                          type: string
+                          format: date-time
+                          description: The date the Routine should start processing.
+                        preferred_settlement_speed:
+                          type: string
+                          description: The requested settlement speed for resulting transfers
+                          enum:
+                          - T+1
+                          - T+2
+                          - T+4
+                        frequency:
+                          type: string
+                          description: The frequency a repeating Routine should process
+                          enum:
+                          - weekly
+                          - bi-weekly
+                          - monthly
+                        active:
+                          type: boolean
+                          description: Whether the routine is active (True) or paused (False). Defaults to True.
+                        status:
+                          type: string
+                          description: The Routine's status on the platform (see [Routine Statuses](https://docs.astra.finance/reference/routine-statuses))
+                        created:
+                          type: string
+                          format: date-time
+                          description: The date the Routine was created
+                        ultimate_receiver_id:
+                          type: string
+                          description: The User ID of the ultimate receiver of the Routine
+                        ultimate_sender_id:
+                          type: string
+                          description: The User ID of the ultimate sender of the Routine
+                  next_cursor_id:
+                    type: string
+                    description: The next cursor ID, for resuming a paginated query
+                  has_next_page:
+                    type: boolean
+                    description: Whether the paginated query has additional pages (value may be null if no there are no additional pages)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1Routines
+      x-operation-id-source: derived
+    post:
+      tags:
+      - Routines
+      summary: Create a new Routine
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        > 📘
+
+        >
+
+        > Use this Routine resource to request Card-to-Card and Account-to-Acccount (real-time, T+0, T+1, T+2, and T+4) payments.
+
+
+        > 🚧
+
+        >
+
+        > Used for reconciliation purposes, the `client_correlation_id` is a custom, alphanumeric string which gets appended to the transactions description by way of the Debit or ACH addenda. The limits are as follows:
+
+        > - Debit Transactions: 8 Characters
+
+        > - ACH Transactions: 80 Characters
+
+        > - RTP / FedNow Transactions: 140 Characters
+
+
+        This endpoint creates a new Routine for a User.
+
+
+        A card used as the source or the destination must be on a network enabled for your client. Cards on Discover, Diners Club, UnionPay, Maestro and private-label networks, whose card numbers begin with 6, are rejected with a `403` for clients not configured for them, whether the card is the source or the destination.'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/headers/Idempotency-Key'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: The type of Routine
+                  enum:
+                  - one-time
+                  - recurring
+                name:
+                  type: string
+                  description: The name given for the Routine
+                payment_type:
+                  type: string
+                  description: The type of payment
+                  enum:
+                  - ach
+                  - debit
+                  - ledger
+                source_id:
+                  type: string
+                  description: The ID of the Source Account
+                destination_id:
+                  type: string
+                  description: The ID of the Destination Account
+                destination_user_id:
+                  type: string
+                  description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                amount:
+                  type: number
+                  format: float
+                  description: The amount of the transfer in USD
+                start_date:
+                  type: string
+                  format: date-time
+                  description: Optional. The date the Routine should start processing (Pacific Timezone). If not supplied, the start_date will default to the current day (in the Pacific Timezone). Debit start dates cannot be in the future.
+                preferred_settlement_speed:
+                  type: string
+                  description: The requested settlement speed for resulting transfers
+                  enum:
+                  - T+1
+                  - T+2
+                  - T+4
+                frequency:
+                  type: string
+                  description: The frequency a repeating Routine should process
+                  enum:
+                  - weekly
+                  - bi-weekly
+                  - monthly
+                client_correlation_id:
+                  type: string
+                  description: An optional correlation id that will be added to ACH or Debit Addenda. This will also be included in the Transfer response.
+                customer_debit_fee_percent_override:
+                  type: number
+                  format: float
+                  description: 'Optional parameter for applying a fee to a debit transfer through either an addition on the pull or a subtraction on the push. Contact your Astra admin to configure your clients to have this percentage fee be either additive or subtractive. For debit transfers only. Example amount: 1.25 = 1.25%'
+                ultimate_receiver_id:
+                  type: string
+                  description: The User ID of the ultimate receiver of the Routine
+                ultimate_sender_id:
+                  type: string
+                  description: The User ID of the ultimate sender of the Routine
+              required:
+              - type
+              - name
+              - source_id
+              - destination_id
+              - amount
+              - payment_type
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  type:
+                    type: string
+                    description: The type of Routine
+                    enum:
+                    - one-time
+                    - recurring
+                  name:
+                    type: string
+                    description: The name given for the Routine
+                  payment_type:
+                    type: string
+                    description: The type of payment
+                    enum:
+                    - ach
+                    - debit
+                    - ledger
+                  source_id:
+                    type: string
+                    description: The ID of the Source Account
+                  destination_id:
+                    type: string
+                    description: The ID of the Destination Account
+                  destination_user_id:
+                    type: string
+                    description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                  start_date:
+                    type: string
+                    format: date-time
+                    description: The date the Routine should start processing.
+                  preferred_settlement_speed:
+                    type: string
+                    description: The requested settlement speed for resulting transfers
+                    enum:
+                    - T+1
+                    - T+2
+                    - T+4
+                  frequency:
+                    type: string
+                    description: The frequency a repeating Routine should process
+                    enum:
+                    - weekly
+                    - bi-weekly
+                    - monthly
+                  active:
+                    type: boolean
+                    description: Whether the routine is active (True) or paused (False). Defaults to True.
+                  status:
+                    type: string
+                    description: The Routine's status on the platform (see [Routine Statuses](https://docs.astra.finance/reference/routine-statuses))
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date the Routine was created
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/validation_error'
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/generic_error_with_note'
+              examples:
+                settlement_speed:
+                  $ref: '#/components/examples/routine_error_settlement_speed'
+                type:
+                  $ref: '#/components/examples/routine_error_type'
+                start_date:
+                  $ref: '#/components/examples/routine_error_start_date'
+                amount:
+                  $ref: '#/components/examples/routine_error_amount'
+                format:
+                  $ref: '#/components/examples/routine_error_amount_format'
+                payment_type:
+                  $ref: '#/components/examples/routine_error_payment_type'
+                customer_debit_fee:
+                  $ref: '#/components/examples/routine_error_customer_debit_fee'
+                invalid_field_combo:
+                  $ref: '#/components/examples/routine_error_invalid_field_combo'
+                routine_error_source_card_errors:
+                  $ref: '#/components/examples/routine_error_source_card_errors'
+                routine_error_destination_card_errors:
+                  $ref: '#/components/examples/routine_error_destination_card_errors'
+                card_type:
+                  $ref: '#/components/examples/routine_error_card_type'
+                same_card:
+                  $ref: '#/components/examples/routine_error_same_card'
+                ccid_limit:
+                  $ref: '#/components/examples/routine_error_client_correlation_limit'
+                velocity_limit:
+                  $ref: '#/components/examples/routine_error_velocity_limit'
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                user_not_approved:
+                  $ref: '#/components/examples/routine_error_user_not_approved'
+                source_card_not_authorized:
+                  $ref: '#/components/examples/routine_error_source_card_not_authorized'
+                dest_card_not_authorized:
+                  $ref: '#/components/examples/routine_error_destination_card_not_authorized'
+      operationId: postV1Routines
+      x-operation-id-source: derived
+  /v1/routines/account-to-card:
+    post:
+      tags:
+      - Routines
+      summary: Create an account to card routine
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Create an account to card routine (aka `instant disbursement`)
+
+
+        > 🚧
+
+        >
+
+        > This endpoint requires an enhanced client configuration for instant disbursements. Please contact customer support if you are interested in this feature.
+
+
+        The destination card''s network must be enabled for your client as well. Cards on Discover, Diners Club, UnionPay, Maestro and private-label networks, whose card numbers begin with 6, are accepted as a disbursement destination only for clients configured for them.'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/headers/Idempotency-Key'
+      requestBody:
+        description: There are two settlement_mode options.  **Option 1** is for Gross Debit Account-to-Card.  **Option 2** is for Net Debit Account-to-Card.
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the Gross Debit Account-to-Card routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer in USD
+                  source:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the source account in Astra
+                    required:
+                    - id
+                  destination:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the destination account in Astra
+                      user_id:
+                        type: string
+                        description: The unique identifier of the receiver in Astra (required if the destination.id does not belong to the authenticating User)
+                    required:
+                    - id
+                  settlement_mode:
+                    type: string
+                    description: The Account-to-Card type
+                    enum:
+                    - gross_debit
+                  debit_fee_percent:
+                    type: number
+                    format: float
+                    description: Fee percentage applied to the debit OCT transfer
+                  client_correlation_id:
+                    type: string
+                    description: A unique descriptor used to correlate a routine with the ACH Debit transfer (must be 8 characters in length)
+                    pattern: ^[A-Za-z0-9^ !_\-@'`\t()#$%&,*:.-\\]{8}$
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+                required:
+                - name
+                - amount
+                - source
+                - destination
+                - settlement_mode
+                - client_correlation_id
+              - type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the Net Debit Account-to-Card routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer in USD
+                  source:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the source account in Astra
+                    required:
+                    - id
+                  destination:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the destination account in Astra
+                      user_id:
+                        type: string
+                        description: The unique identifier of the receiver in Astra
+                    required:
+                    - id
+                    - user_id
+                  settlement_mode:
+                    type: string
+                    description: The Account-to-Card type
+                    enum:
+                    - net_debit
+                  debit_fee_percent:
+                    type: number
+                    format: float
+                    description: Fee percentage applied to the debit OCT transfer
+                  client_correlation_id:
+                    type: string
+                    description: A unique descriptor used to correlate a routine with the ACH Debit transfer (must be 8 characters in length)
+                    pattern: ^[A-Za-z0-9^ !_\-@'`\t()#$%&,*:.-\\]{8}$
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+                required:
+                - name
+                - amount
+                - source
+                - destination
+                - settlement_mode
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  status:
+                    type: string
+                    description: The Routine's status on the platform (see [Routine Statuses](https://docs.astra.finance/reference/routine-statuses))
+                  name:
+                    type: string
+                    description: The name given for the Routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer
+                  source:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the source account in Astra
+                  destination:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the destination account in Astra
+                      user_id:
+                        type: string
+                        description: The unique identifier of the receiver in Astra
+                  start_date:
+                    type: string
+                    format: date-time
+                    description: The date the Routine should start processing.
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date the Routine was created
+                  active:
+                    type: boolean
+                    description: Whether the routine is active (True) or paused (False). Defaults to True.
+                  payment_route:
+                    type: string
+                    description: Payment route type
+                    enum:
+                    - account_to_card
+                  type:
+                    type: string
+                    description: The type of Routine
+                    enum:
+                    - one-time
+                  blocked:
+                    type: boolean
+                    description: Whether the routine has been blocked for any reason.
+                  debit_fee_percent:
+                    type: number
+                    format: float
+                    description: Fee percentage applied to the debit OCT transfer
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: postV1RoutinesAccountToCard
+      x-operation-id-source: derived
+  /v1/routines/book:
+    post:
+      tags:
+      - Routines
+      summary: Create a book transfer routine
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Create a new book transfer routine (a book transfer between two Payment Instruments).
+
+
+        The `access_token` must be issued to the Business User that was created with the Business Profile ID attached to the client. This Business User is visible in the Dashboard under the `Account Identifiers` section in the production Dashboard or the sandbox Dashboard.
+
+
+        > 📘
+
+        >
+
+        > The resulting **Book Routine ID** (`id`) can be queried against `GET /v1/routines/{id}`.
+
+        > The resulting **Book Transfer ID** can be queried against `GET /v1/transfers/{transfer_id}`.
+
+        > Both Routine and Transfer status updates will trigger the associated Routine webhooks and Transfer webhooks.
+
+
+        > 🚧
+
+        >
+
+        > In the event of any failure response, the routine is **not** created.'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/headers/Idempotency-Key'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the book transfer routine
+                amount:
+                  type: number
+                  format: float
+                  description: The amount of the transfer, in USD
+                source:
+                  type: string
+                  description: The Payment Instrument ID to originate the transfer
+                destination:
+                  type: string
+                  description: The Payment Instrument ID to receive the transfer
+              required:
+              - name
+              - amount
+              - source
+              - destination
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: The routine was created successfully.
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  name:
+                    type: string
+                    description: The name given for the Routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer
+                  source:
+                    type: string
+                    description: The Payment Instrument ID that originated the transfer
+                  destination:
+                    type: string
+                    description: The Payment Instrument ID that received the transfer
+                  payment_route:
+                    type: string
+                    description: Payment route type
+                    enum:
+                    - book
+                  start_date:
+                    type: string
+                    format: date
+                    description: The date the Routine should start processing.
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date the Routine was created
+                  status:
+                    type: string
+                    description: The Routine's status on the platform (see [Routine Statuses](https://docs.astra.finance/reference/routine-statuses))
+              examples:
+                book_routine:
+                  summary: Successful response
+                  value:
+                    amount: 1234.52
+                    created: '2024-08-04T09:10:07.397325+00:00'
+                    destination: payment_instrument_id_destination
+                    id: unique_routine_id_generated
+                    name: custom routine name
+                    payment_route: book
+                    source: payment_instrument_id_source
+                    start_date: '2024-08-04'
+                    status: active
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/validation_error'
+              examples:
+                payment_instrument_validation:
+                  summary: Payment Instrument validation error
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description:
+                    - Source cannot be used for this transfer.
+                    - Destination cannot be used for this transfer.
+                invalid_idempotency_key:
+                  summary: Invalid Idempotency-Key
+                  value:
+                    status_code: 400
+                    name: RequestDataError
+                    description:
+                      idempotency_key:
+                      - Not a valid UUID.
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '403':
+          description: Returned when the `access_token` used was not generated for the Business User associated with the Client.
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                payment_route_not_permitted:
+                  summary: Forbidden
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description:
+                    - User is not permitted to use payment route.
+      operationId: postV1RoutinesBook
+      x-operation-id-source: derived
+  /v1/routines/card-to-account:
+    post:
+      tags:
+      - Routines
+      summary: Create a card to account routine
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Create a card to account routine (funding from card)
+
+
+        > 🚧
+
+        >
+
+        > This endpoint requires an enhanced client configuration for funding from card. Please contact customer support if you are interested in this feature.
+
+
+        The source card''s network must be enabled for your client as well. Cards on Discover, Diners Club, UnionPay, Maestro and private-label networks, whose card numbers begin with 6, are accepted as a funding source only for clients configured for them.'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          $ref: '#/components/headers/Idempotency-Key'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the routine
+                amount:
+                  type: number
+                  format: float
+                  description: The amount of the transfer in USD
+                client_correlation_id:
+                  type: string
+                  description: A unique descriptor used to correlate a routine with the ACH Credit transfer (must be 8 characters in length)
+                  pattern: ^[A-Za-z0-9^ !_\-@'`\t()#$%&,*:.-\\]{8}$
+                start_date:
+                  type: string
+                  format: date-time
+                  description: Optional. The date the Routine should start processing (Pacific Timezone). If not supplied, the start_date will default to the current day (in the Pacific Timezone)
+                source:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The unique identifier of the source account in Astra
+                  required:
+                  - id
+                destination:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The unique identifier of the destination account in Astra
+                    user_id:
+                      type: string
+                      description: The unique identifier of the receiver in Astra (required if the destination.id does not belong to the authenticating User)
+                  required:
+                  - id
+                debit_fee_percent:
+                  type: number
+                  format: float
+                  description: Fee percentage applied to the debit OCT transfer
+                ultimate_receiver_id:
+                  type: string
+                  description: The User ID of the ultimate receiver of the Routine
+                ultimate_sender_id:
+                  type: string
+                  description: The User ID of the ultimate sender of the Routine
+              required:
+              - name
+              - amount
+              - client_correlation_id
+              - source
+              - destination
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  status:
+                    type: string
+                    description: The Routine's status on the platform (see [Routine Statuses](https://docs.astra.finance/reference/routine-statuses))
+                  name:
+                    type: string
+                    description: The name given for the Routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer
+                  source:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the source account in Astra
+                  destination:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The unique identifier of the destination account in Astra
+                      user_id:
+                        type: string
+                        description: The unique identifier of the receiver in Astra
+                  start_date:
+                    type: string
+                    format: date-time
+                    description: The date the Routine should start processing.
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date the Routine was created
+                  active:
+                    type: boolean
+                    description: Whether the routine is active (True) or paused (False). Defaults to True.
+                  payment_route:
+                    type: string
+                    description: Payment route type
+                    enum:
+                    - card_to_account
+                  type:
+                    type: string
+                    description: The type of Routine
+                    enum:
+                    - one-time
+                  blocked:
+                    type: boolean
+                    description: Whether the routine has been blocked for any reason.
+                  debit_fee_percent:
+                    type: number
+                    format: float
+                    description: Fee percentage applied to the debit OCT transfer
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: postV1RoutinesCardToAccount
+      x-operation-id-source: derived
+  /v1/routines/preview:
+    post:
+      tags:
+      - Routines
+      summary: Routine Preview
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint returns a fee structure payload as a response, which provides a preview of what the fee structure will be upon submitting a routine with the same parameters.
+
+
+        > 🚧
+
+        >
+
+        > This endpoint can only be used for previewing routines of a `debit` `payment_type`.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: The type of Routine
+                  enum:
+                  - one-time
+                  - recurring
+                name:
+                  type: string
+                  description: The name given for the Routine
+                payment_type:
+                  type: string
+                  description: The type of payment
+                  enum:
+                  - debit
+                source_id:
+                  type: string
+                  description: The ID of the Source Account
+                destination_id:
+                  type: string
+                  description: The ID of the Destination Account
+                destination_user_id:
+                  type: string
+                  description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                amount:
+                  type: number
+                  format: float
+                  description: The amount of the transfer (when explicitly defined like one-time)
+                start_date:
+                  type: string
+                  format: date-time
+                  description: Optional. The date the Routine should start processing (Pacific Timezone). If not supplied, the start_date will default to the current day (in the Pacific Timezone). Debit start dates cannot be in the future.
+                customer_debit_fee_percent_override:
+                  type: number
+                  format: float
+                  description: 'Optional parameter for applying a fee to a debit transfer through either an addition on the pull or a subtraction on the push. Contact your Astra admin to configure your clients to have this percentage fee be either additive or subtractive. For debit transfers only. Example amount: 1.25 = 1.25%'
+              required:
+              - type
+              - name
+              - payment_type
+              - source_id
+              - destination_id
+              - amount
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  astra_fee:
+                    type: number
+                    format: float
+                    description: Astra's fee for the transfer
+                  created:
+                    type: string
+                    format: date-time
+                    description: Date and time of routine preview creation
+                  customer_fee:
+                    type: number
+                    format: float
+                    description: Customer fee for the transfer
+                  destination:
+                    type: string
+                    description: The ID of the Destination Account
+                  destination_user_id:
+                    type: string
+                    description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                  estimated_settlement:
+                    type: string
+                    description: Estimated settlement speed
+                  payment_type:
+                    type: string
+                    description: Type of payment
+                    enum:
+                    - debit
+                  pull_amount:
+                    type: number
+                    format: float
+                    description: Pull amount for the transfer
+                  push_amount:
+                    type: number
+                    format: float
+                    description: Push amount for the transfer
+                  routine_type:
+                    type: string
+                    description: The type of Routine
+                    enum:
+                    - one-time
+                    - recurring
+                  source:
+                    type: string
+                    description: The ID of the Source Account
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/generic_error_with_note'
+              examples:
+                routine_error_source_card_errors:
+                  $ref: '#/components/examples/routine_error_source_card_errors'
+                routine_error_destination_card_errors:
+                  $ref: '#/components/examples/routine_error_destination_card_errors'
+                card_type:
+                  $ref: '#/components/examples/routine_error_card_type'
+                same_card:
+                  $ref: '#/components/examples/routine_error_same_card'
+                velocity_limit:
+                  $ref: '#/components/examples/routine_error_velocity_limit'
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                source_card_not_authorized:
+                  $ref: '#/components/examples/routine_error_source_card_not_authorized'
+                dest_card_not_authorized:
+                  $ref: '#/components/examples/routine_error_destination_card_not_authorized'
+      operationId: postV1RoutinesPreview
+      x-operation-id-source: derived
+  /v1/routines/{id}:
+    get:
+      tags:
+      - Routines
+      summary: Get a Specific Routine for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint retrieves a specific Routine for a User based on the Routine ID.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of Routine
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  type:
+                    type: string
+                    description: The type of Routine
+                    enum:
+                    - one-time
+                    - recurring
+                  name:
+                    type: string
+                    description: The name given for the Routine
+                  payment_type:
+                    type: string
+                    description: The type of payment
+                    enum:
+                    - ach
+                    - debit
+                    - ledger
+                  source_id:
+                    type: string
+                    description: The ID of the Source Account
+                  destination_id:
+                    type: string
+                    description: The ID of the Destination Account
+                  destination_user_id:
+                    type: string
+                    description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                  start_date:
+                    type: string
+                    format: date-time
+                    description: The date the Routine should start processing.
+                  preferred_settlement_speed:
+                    type: string
+                    description: The requested settlement speed for resulting transfers
+                    enum:
+                    - T+1
+                    - T+2
+                    - T+4
+                  frequency:
+                    type: string
+                    description: The frequency a repeating Routine should process
+                    enum:
+                    - weekly
+                    - bi-weekly
+                    - monthly
+                  active:
+                    type: boolean
+                    description: Whether the routine is active (True) or paused (False). Defaults to True.
+                  status:
+                    type: string
+                    description: The Routine's status on the platform (see [Routine Statuses](https://docs.astra.finance/reference/routine-statuses))
+                  failure_reason:
+                    type: string
+                    description: The reason for the routine processing failure (property will not be returned if null)
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date the Routine was created
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1RoutinesById
+      x-operation-id-source: derived
+    put:
+      tags:
+      - Routines
+      summary: Update an Existing Routine
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint updates an existing Routine for a User.
+
+
+        > 🚧
+
+        >
+
+        > Routine types may not be changed. Any of the non-required parameters below may be updated with this endpoint, provided they are included in the model for that Routine type.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name given for the Routine
+                payment_type:
+                  type: string
+                  description: The type of Payment
+                  enum:
+                  - ach
+                  - debit
+                  - ledger
+                active:
+                  type: boolean
+                  description: Whether the routine is active (True) or paused (False). Defaults to True.
+                source_id:
+                  type: string
+                  description: The ID of the Source Account
+                destination_id:
+                  type: string
+                  description: The ID of the Destination Account
+                amount:
+                  type: number
+                  format: float
+                  description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                start_date:
+                  type: string
+                  format: date-time
+                  description: The date the Routine should start processing (timezone is "America/Los_Angeles")
+                preferred_settlement_speed:
+                  type: string
+                  description: The requested settlement speed for resulting transfers
+                  enum:
+                  - T+1
+                  - T+2
+                  - T+4
+                frequency:
+                  type: string
+                  description: The frequency a repeating Routine should process
+                  enum:
+                  - weekly
+                  - bi-weekly
+                  - monthly
+                client_correlation_id:
+                  type: string
+                  description: An optional correlation id that will be added to ACH Addenda. This will also be included in the Transfer response.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: The unique ID of Routine
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Routine
+                  type:
+                    type: string
+                    description: The type of Routine
+                    enum:
+                    - one-time
+                    - recurring
+                  name:
+                    type: string
+                    description: The name given for the Routine
+                  payment_type:
+                    type: string
+                    description: The type of Payment
+                    enum:
+                    - ach
+                    - debit
+                    - ledger
+                  active:
+                    type: boolean
+                    description: Whether the routine is active (True) or paused (False). Defaults to True.
+                  source_id:
+                    type: string
+                    description: The ID of the Source Account
+                  destination_id:
+                    type: string
+                    description: The ID of the Destination Account
+                  destination_user_id:
+                    type: string
+                    description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                  ultimate_receiver_id:
+                    type: string
+                    description: The User ID of the ultimate receiver of the Routine
+                  ultimate_sender_id:
+                    type: string
+                    description: The User ID of the ultimate sender of the Routine
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                  start_date:
+                    type: string
+                    format: date-time
+                    description: The date the Routine should start processing (timezone is "America/Los_Angeles")
+                  preferred_settlement_speed:
+                    type: string
+                    description: The requested settlement speed for resulting transfers
+                    enum:
+                    - T+1
+                    - T+2
+                    - T+4
+                  frequency:
+                    type: string
+                    description: The frequency a repeating Routine should process
+                    enum:
+                    - weekly
+                    - bi-weekly
+                    - monthly
+                  client_correlation_id:
+                    type: string
+                    description: An optional correlation id that will be added to ACH Addenda. This will also be included in the Transfer response.
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/validation_error'
+              examples:
+                debit_routine:
+                  summary: Cannot Edit Debit Routine
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Debit routines cannot be edited.
+                settlement_speed:
+                  $ref: '#/components/examples/routine_error_settlement_speed'
+                type:
+                  $ref: '#/components/examples/routine_error_type'
+                start_date:
+                  $ref: '#/components/examples/routine_error_start_date'
+                amount:
+                  $ref: '#/components/examples/routine_error_amount'
+                format:
+                  $ref: '#/components/examples/routine_error_amount_format'
+                payment_type:
+                  $ref: '#/components/examples/routine_error_payment_type'
+                customer_debit_fee:
+                  $ref: '#/components/examples/routine_error_customer_debit_fee'
+                invalid_field_combo:
+                  $ref: '#/components/examples/routine_error_invalid_field_combo'
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '404':
+          description: Not Found
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                routine_not_found:
+                  summary: Routine Not Found for User
+                  value:
+                    code: 404
+                    name: Not Found
+                    description: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+      operationId: putV1RoutinesById
+      x-operation-id-source: derived
+    delete:
+      tags:
+      - Routines
+      summary: Delete a Routine for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint removes a specific Routine for a User based on the Routine ID. The Response will only include a Response Code.
+
+
+        > ❗
+
+        >
+
+        > Not applicable to `one-time` routines. Deleting a routine does not prevent it from processing.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of Routine
+        schema:
+          type: string
+        required: true
+      responses:
+        '204':
+          description: Successful response
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: deleteV1RoutinesById
+      x-operation-id-source: derived
+  /v1/routines/{id}/transfers:
+    get:
+      tags:
+      - Routines
+      summary: List Transfers for a Routine
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Retrieve all Transfers for a Routine.
+
+
+        > 📘
+
+        >
+
+        > This resource returns paginated results in descending order. For more details please see: Pagination'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+        description: The routine_id
+      - name: page_size
+        in: query
+        description: The maximum number of items returned with each request.  Defaults to 25 if not specified.
+        schema:
+          type: integer
+          minimum: 10
+          maximum: 100
+        required: false
+      - name: cursor_id
+        in: query
+        description: The pagination cursor ID.  When specified, allows one to navigate between pages.  If not specified the first page of results will be returned.
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The number of transfers returned
+                  transfers:
+                    type: array
+                    items:
+                      schema: null
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique ID of the transfer
+                        routine_type:
+                          type: string
+                          description: The type of routine associated with the transfer
+                          enum:
+                          - one-time
+                          - recurring
+                        routine_name:
+                          type: string
+                          description: The name of the routine associated with the transfer
+                        routine_id:
+                          type: string
+                          description: The unique ID of the routine associated with the transfer
+                        client_correlation_id:
+                          type: string
+                          description: An optional correlation id that will be added to ACH or Debit Addenda. This will also be included in the Transfer response.
+                        source_id:
+                          type: string
+                          description: The ID of the Source Account
+                        destination_id:
+                          type: string
+                          description: The ID of the Destination Account
+                        destination_user_id:
+                          type: string
+                          description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                        amount:
+                          type: number
+                          format: float
+                          description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                        payment_type:
+                          type: string
+                          description: The type of payment
+                          enum:
+                          - ach
+                          - debit
+                          - ledger
+                        initiated:
+                          type: string
+                          format: date-time
+                          description: The date and time the transfer was initiated
+                        net_credit_batch_id:
+                          type: string
+                          description: The Net Credit Batch Transfer ID associated with this transfer
+                        net_debit_batch_id:
+                          type: string
+                          description: The Net Debit Batch Transfer ID associated with this transfer
+                        updated:
+                          type: string
+                          format: date-time
+                          description: The date and time the transfer was updated
+                        estimated_clearing_date:
+                          type: string
+                          format: date-time
+                          description: The estimated date and time the transfer will clear
+                        astra_settlement_reason:
+                          type: string
+                          description: The reason that an estimated settlement date may have been changed
+                        failure_reason:
+                          type: string
+                          description: The reason that astra transfer was not successful
+                        status:
+                          type: string
+                          description: The status of the Transfer
+                          enum:
+                          - pending
+                          - processed
+                          - cancelled
+                          - failed
+                        chargeback:
+                          type: object
+                          description: A chargeback object associated with the transfer (if transfer was disputed)
+                          properties:
+                            action_status:
+                              type: string
+                              description: The current status of the chargeback. [(See Chargeback Statuses)](https://docs.astra.finance/reference/chargeback-webhooks#chargeback-statuses)
+                            cb_id:
+                              type: string
+                              description: The unique chargeback ID
+                            created:
+                              type: string
+                              format: date-time
+                              description: The date-time when the Astra chargeback record was created
+                            dispute_status:
+                              type: string
+                              description: The current status of the dispute. [(See Dispute Statuses)](https://docs.astra.finance/reference/chargeback-webhooks#chargeback-dispute-statuses)
+                              enum:
+                              - Not Disputed
+                              - Open
+                              - Won
+                              - Lost
+                            exception_code:
+                              type: string
+                              description: The chargeback exception code
+                            exception_date:
+                              type: string
+                              format: date
+                              description: The date the chargeback was filed with the user's financial institution
+                            exception_description:
+                              type: string
+                              description: The description of the chargeback exception code
+                            exception_id:
+                              type: string
+                              description: The unique exception ID
+                            exception_settled_amount:
+                              type: number
+                              format: float
+                              description: The amount (in cents) of funds claimed in the chargeback
+                            exception_type:
+                              type: string
+                              description: The current exception type (CHARGEBACK or REPRESENTMENT)
+                            merchant_reference_id:
+                              type: string
+                              description: The merchant reference ID
+                            network_id:
+                              type: string
+                              description: The network ID
+                            original_creation_date:
+                              type: string
+                              format: date
+                              description: The date the related transfer was created
+                            original_processed_date:
+                              type: string
+                              format: date
+                              description: The date the related transfer was processed
+                            original_settled_amount:
+                              type: number
+                              format: float
+                              description: The amount (in cents) of funds moved by the transfer
+                            status_date:
+                              type: string
+                              format: date
+                              description: The date of the most recent status update
+                            updated:
+                              type: string
+                              format: date-time
+                              description: The date-time the chargeback was updated
+                            user_id:
+                              type: string
+                              description: The Astra user ID associated with the chargeback
+                  next_cursor_id:
+                    type: string
+                    description: The next cursor ID, for resuming a paginated query
+                  has_next_page:
+                    type: boolean
+                    description: Whether the paginated query has additional pages (value may be null if no there are no additional pages)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1RoutinesByIdTransfers
+      x-operation-id-source: derived
+components:
+  examples:
+    routine_error_start_date:
+      summary: Invalid Start Date
+      value:
+        status_code: 400
+        description:
+          start_date:
+          - Start date must be in the format YYYY-MM-DD.
+    routine_error_type:
+      summary: Invalid Type
+      value:
+        status_code: 400
+        description:
+          type:
+          - Invalid routine type.
+    routine_error_card_type:
+      summary: Card type
+      value:
+        code: 400
+        name: Bad Request
+        description: Both source and destination must be debit cards.
+    routine_error_velocity_limit:
+      summary: Velocity limit
+      value:
+        code: 400
+        name: Bad Request
+        description: User has reached the velocity limit for debit transfers.
+    routine_error_invalid_field_combo:
+      summary: Invalid Routine Field Combination
+      value:
+        status_code: 400
+        description:
+          _schema:
+          - A routine cannot have 'amount' and 'percent_of_transaction' simultaneously.
+          - A routine cannot have 'amount' and 'percent_of_balance' simultaneously.
+          - A routine cannot have 'amount' and 'minimum_transaction_threshold' simultaneously.
+          - Percent of transaction and percent of balance cannot both be set.
+    routine_error_customer_debit_fee:
+      summary: Invalid Customer Debit Fee Percent
+      value:
+        status_code: 400
+        description:
+          customer_debit_fee_percent_override:
+          - Customer debit fee percent override may not exceed 10%.
+    generic_error_unauthorized:
+      summary: Invalid or Expired Access Token
+      value:
+        code: 401
+        name: Unauthorized
+        description: null
+    routine_error_client_correlation_limit:
+      summary: client_correlation_id limit
+      value:
+        code: 400
+        name: Bad Request
+        description: Client Correlation ID must not be longer than 8 characters.
+    routine_error_same_card:
+      summary: Same card
+      value:
+        code: 400
+        name: Bad Request
+        description: Source card and destination card may not be the same card.
+    routine_error_amount:
+      summary: Invalid Amount
+      value:
+        status_code: 400
+        description:
+          amount:
+          - Amount must be greater than or equal to 1.
+    routine_error_payment_type:
+      summary: Invalid Payment Type
+      value:
+        status_code: 400
+        description:
+          payment_type:
+          - Invalid payment type.
+    routine_error_destination_card_errors:
+      summary: Destination Card Errors List
+      value:
+        DEVELOPER_NOTE: DEVELOPER_NOTE field not included in the actual response.  description field is of type string, and will produce only one of the following error messages.
+        code: 400
+        name: Bad Request
+        description:
+        - Destination card address could not be verified.
+        - Destination card is not enabled for push-to-card transactions.
+        - Destination card is not a debit card.
+        - Destination card is pending approval.
+        - Destination card is expired.
+        - Destination card is not authorized for use.
+    routine_error_amount_format:
+      summary: Invalid Amount Format
+      value:
+        status_code: 400
+        description:
+          amount:
+          - 'Amount must be a dollar amount in the format #.##'
+    routine_error_source_card_errors:
+      summary: Source Card Errors List
+      value:
+        DEVELOPER_NOTE: DEVELOPER_NOTE field not included in the actual response.  description field is of type string, and will produce only one of the following error messages.
+        code: 400
+        name: Bad Request
+        description:
+        - Source card address could not be verified.
+        - Source card is not enabled for pull-from-card transactions.
+        - Source card is not a debit card.
+        - Source card is pending approval.
+        - Source card is expired.
+        - Source card is not authorized for use.
+    routine_error_user_not_approved:
+      summary: User Status is not Approved
+      value:
+        code: 403
+        name: Forbidden
+        description: Unverified Users may not create routines.
+    routine_error_source_card_not_authorized:
+      summary: Source card is blacklisted
+      value:
+        code: 403
+        name: Forbidden
+        description: Source card is not authorized for use.
+    routine_error_settlement_speed:
+      summary: Invalid Preferred Settlement Speed
+      value:
+        status_code: 400
+        description:
+          preferred_settlement_speed:
+          - Preferred settlement speed is invalid
+    routine_error_destination_card_not_authorized:
+      summary: Destination card is blacklisted
+      value:
+        code: 403
+        name: Forbidden
+        description: Destination card is not authorized for use.
+  schemas:
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+    validation_error:
+      type: object
+      properties:
+        status_code:
+          description: HTTP Response code
+          type: integer
+        description:
+          description: Object of invalid fields with accompanying descriptions
+          type: object
+    generic_error_with_note:
+      allOf:
+      - type: object
+        properties:
+          developer_note:
+            description: Field for developer notes
+            type: string
+      - $ref: '#/components/schemas/generic_error'
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+    Idempotency-Key:
+      description: Idempotency Key header.  Must be in UUID format.
+      schema:
+        type: string
+        pattern: ^.{0,128}$
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

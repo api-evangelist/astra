@@ -1,0 +1,371 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Authorization API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Authorization
+paths:
+  /v1/oauth/token:
+    post:
+      tags:
+      - Authorization
+      summary: Authorize a User
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        Use this endpoint to both initially Authorize a User, and also to Refresh Authorization for a user.
+
+
+        In the **Form Data** below, **Option 1** is for the initial action to Authorize a User. **Option 2** is for the action of using the `refresh_token` to generate a new `access_token`.'
+      requestBody:
+        description: There are two options for retrieving authorization on behalf of a user.  First is the initial authorization request, which requires an authorization_code generated after a user authenticates.  Second, is the method of refreshing a user's access_token.
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              oneOf:
+              - type: object
+                properties:
+                  grant_type:
+                    type: string
+                    description: Grant type of `authorization_code` for initial authorization to generate an `access_token` for a specific user
+                    enum:
+                    - authorization_code
+                  code:
+                    type: string
+                    format: password
+                    description: 'The authorization code your Client received after the User authorized your application.
+
+
+                      The authorization_code is only active for approximately 2 minutes. After it expires, a new authorization_code will need to be obtained.
+
+                      '
+                  redirect_uri:
+                    type: string
+                    description: The redirect URI you want to send Authenticated Users to on success (this must match your Developer Account settings)
+                  expires_in:
+                    type: integer
+                    description: The TTL of the access_token in seconds. Defaults to 7200 if not included. Valid values are between 300 and 86400 inclusive.
+                required:
+                - client_id
+                - client_secret
+                - grant_type
+                - code
+                - redirect_uri
+              - type: object
+                properties:
+                  grant_type:
+                    type: string
+                    description: Grant type of `refresh_token` to refresh authorization and receive a fresh `access_token`
+                    enum:
+                    - refresh_token
+                  refresh_token:
+                    type: string
+                    format: password
+                    description: The `refresh_token` granted with the associated`access_token`
+                  redirect_uri:
+                    type: string
+                    description: The redirect URI you want to send Authenticated Users to on success (this must match your Developer Account settings)
+                  expires_in:
+                    type: integer
+                    description: The TTL of the access_token in seconds. Defaults to 7200 if not included. Valid values are between 300 and 86400 inclusive.
+                required:
+                - grant_type
+                - code
+                - redirect_uri
+                - refresh_token
+      responses:
+        '200':
+          description: Authorization Responses
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/oauth_success_response'
+              examples:
+                success:
+                  summary: Successful Response
+                  value:
+                    access_token: abc123
+                    expires_in: 7200
+                    refresh_token: abc123
+                    token_type: Bearer
+        '400':
+          description: Authorization Responses
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/oauth_error'
+                - $ref: '#/components/schemas/oauth_error_description'
+              examples:
+                refresh_token:
+                  summary: Expired or invalid refresh_token
+                  value:
+                    error: invalid_grant
+                code:
+                  summary: Expired or invalid code
+                  value:
+                    error: invalid_request
+                    error_description: Invalid "code" in request.
+                redirect_uri:
+                  summary: redirect_uri doesn't match value set in Dashboard
+                  value:
+                    error: invalid_request
+                    error_description: Invalid "redirect_uri" in request.
+      security:
+      - basicAuth: []
+      operationId: postV1OauthToken
+      x-operation-id-source: derived
+  /v1/partner/identity/token:
+    post:
+      tags:
+      - Authorization
+      summary: Authorize a User via API
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        Using the `session_token` obtained from `/v1/partner/identity/verification`, call Astra’s Partner Identity Token endpoint to Authorize the User via API.
+
+
+        The result of successfully calling this endpoint will result in the creation of an access_token and refresh_token.
+
+
+        > 🚧
+
+        >
+
+        > This resource requires the OAuth Client to be configured for Trusted Authentication.
+
+
+        > ❗️
+
+        >
+
+        > This resource is only available for eligible programs. Please reach out to your Astra Integration Specialist for more information.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: The `session_token` obtained from the `/v1/partner/identity/verification` call
+                user_consent_captured:
+                  type: boolean
+                  description: By setting `user_consent_captured` to true, you are confirming that the End-User has consented to [Astra’s Terms of Service](https://astrafi.com/terms/) and [Privacy Policy](https://astrafi.com/privacy/).
+                expires_in:
+                  type: integer
+                  description: The TTL of the `access_token` in seconds. Defaults to 7200 if not included. Valid values are between 300 and 86400 inclusive
+              required:
+              - token
+              - user_consent_captured
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/oauth_success_response'
+              examples:
+                success:
+                  summary: Successful Response
+                  value:
+                    access_token: abc123
+                    expires_in: 7200
+                    refresh_token: abc123
+                    token_type: Bearer
+      operationId: postV1PartnerIdentityToken
+      x-operation-id-source: derived
+  /v1/partner/identity/verification:
+    post:
+      tags:
+      - Authorization
+      summary: Generate a Partner Identity Verification Token
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        This endpoint generates a short-lived token that can be used to bypass the phone verification in the Astra SDK.
+
+
+        The token string must be included as a query param called `session_token` when directing users to the Astra SDK.
+
+
+        > 🚧
+
+        >
+
+        > This resource requires the OAuth Client to be configured for Trusted Authentication.
+
+
+        > ❗️
+
+        >
+
+        > This resource is only available for eligible programs. Please reach out to your Astra Integration Specialist for more information.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_intent_id:
+                  type: string
+                  description: The unique Astra user intent ID (required if a Personal User does not already exist in Astra's system)
+                business_profile_id:
+                  type: string
+                  description: The unique Astra Business Profile ID (required if a Business User does not already exist in Astra's system)
+                user_id:
+                  type: string
+                  description: The unique Astra user ID (required if the the Personal/Business User has already been created)
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The short-lived verification token to be provided as a query param in the Astra SDK
+      operationId: postV1PartnerIdentityVerification
+      x-operation-id-source: derived
+components:
+  schemas:
+    oauth_error_description:
+      type: object
+      properties:
+        error:
+          description: Error message
+          type: string
+        error_description:
+          description: Error description
+          type: string
+    oauth_success_response:
+      type: object
+      properties:
+        access_token:
+          type: string
+          format: password
+          description: The access token for the User (used for any Bearer Auth resources)
+        expires_in:
+          type: integer
+          description: Seconds from the time of authorization that the `access_token` will expire
+        refresh_token:
+          type: string
+          format: password
+          description: The token that can be used to refresh authorization and retrieve a new `access_token`
+        token_type:
+          type: string
+          description: The type of token returned
+    oauth_error:
+      type: object
+      properties:
+        error:
+          description: Error message
+          type: string
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

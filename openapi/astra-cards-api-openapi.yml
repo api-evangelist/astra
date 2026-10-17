@@ -1,0 +1,1590 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Cards API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Cards
+paths:
+  /v1/bins/{bin}:
+    get:
+      tags:
+      - Cards
+      summary: Get Card BIN Information
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        > 🚧
+
+        >
+
+        > The following BINs will return results in Sandbox:
+
+        > * 400000
+
+        > * 400022
+
+        > * 440393
+
+        > * 460369
+
+        > * 475833
+
+        > * 498503
+
+        > * 510805
+
+        > * 520082
+
+        > * 559430
+
+
+        Use this endpoint to retrieve card network information for a given Bank Identification Number.'
+      security:
+      - basicAuth: []
+      parameters:
+      - name: bin
+        in: path
+        schema:
+          type: string
+        required: true
+        description: The Bank Identification Number (first six digits of a card)
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bin:
+                    description: The provided Bank Identification Number (BIN)
+                    type: string
+                  card_brand:
+                    description: The card brand associated with the BIN
+                    type: string
+                  card_type:
+                    description: The card type associated with the BIN
+                    type: string
+                    enum:
+                    - debit
+                    - prepaid
+                    - credit
+                    - unknown
+                  interchange_category:
+                    description: The interchange category for the provided BIN
+                    type: string
+                    enum:
+                    - regulated
+                    - unregulated
+                  issuer_name:
+                    description: The financial institution that issued the card
+                    type: string
+                  settlement_network:
+                    description: The settlement network used for payment
+                    type: string
+      operationId: getV1BinsByBin
+      x-operation-id-source: derived
+  /v1/cards:
+    get:
+      tags:
+      - Cards
+      summary: List Cards for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Retrieve all Debit Cards for a user.
+
+
+        > 📘
+
+        >
+
+        > This resource returns paginated results in descending order. For more details please see: Pagination'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: include_removed
+        in: query
+        description: Boolean to include cards that have been removed by the user in the response. Defaults to `false`.
+        schema:
+          type: boolean
+      - name: page_size
+        in: query
+        description: The maximum number of items returned with each request.  Defaults to 25 if not specified.
+        schema:
+          type: integer
+          minimum: 10
+          maximum: 100
+        required: false
+      - name: cursor_id
+        in: query
+        description: The pagination cursor ID.  When specified, allows one to navigate between pages.  If not specified the first page of results will be returned.
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The number of cards returned
+                  cards:
+                    type: array
+                    items:
+                      schema: null
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Unique card ID
+                        active:
+                          type: boolean
+                          description: Whether or not the card is active with the issuing bank
+                        address_verified:
+                          type: boolean
+                          description: AVS response from debit networks
+                        card_company:
+                          type: string
+                          description: Name of card company
+                        card_fingerprint:
+                          type: string
+                          description: A unique identifier derived from the card number
+                        card_type:
+                          type: string
+                          description: The type of card
+                          enum:
+                          - debit
+                          - prepaid
+                          - credit
+                          - unknown
+                        city:
+                          type: string
+                          description: The city of the card billing address
+                        created:
+                          type: string
+                          format: date-time
+                          description: Date and time of card creation
+                        expiration_date:
+                          type: string
+                          description: Month/Year of card expiration
+                        first_name:
+                          type: string
+                          description: The first name of card user
+                        first_six_digits:
+                          type: string
+                          description: The provided Bank Identification Number (BIN)
+                        last_four_digits:
+                          type: string
+                          description: Last 4 digits of the card number
+                        last_name:
+                          type: string
+                          description: The last name of card user
+                        name_verification_result:
+                          type: string
+                          description: The ANI results from the issuing bank of the card
+                          enum:
+                          - Match
+                          - No Match
+                          - Partial Match
+                          - Unknown
+                        product_type:
+                          type: string
+                          description: The product type of the card
+                          enum:
+                          - Consumer
+                          - Business
+                          - Commercial
+                          - Unknown
+                        pull_enabled:
+                          type: boolean
+                          description: Whether or not the card is enabled for pull transactions
+                        push_enabled:
+                          type: boolean
+                          description: Whether or not the card is enabled for push transactions
+                        aft_enabled:
+                          type: boolean
+                          description: If true, this card is allowed to be used as a source in routines.
+                        oct_enabled:
+                          type: boolean
+                          description: If true, this card is allowed to be used as a desetination in routines.
+                        removed:
+                          type: boolean
+                          description: Whether or not the user has removed the card
+                        review_reasons:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              code:
+                                type: string
+                                description: The review reason code (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                              description:
+                                type: string
+                                description: The review reason description (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                        reviewed_at:
+                          type: string
+                          format: date-time
+                          description: The date and time the Card was reviewed
+                        review_status:
+                          type: string
+                          description: (Deprecated) Review status of the card
+                          enum:
+                          - approved
+                          - flagged
+                          - rejected
+                        state:
+                          type: string
+                          description: Card address state
+                        status:
+                          type: string
+                          description: The status of the card ([Card Statuses](https://docs.astra.finance/reference/card-review-statuses#card-statuses))
+                          enum:
+                          - approved
+                          - flagged
+                          - rejected
+                          - removed
+                        street_line_1:
+                          type: string
+                          description: The street line 1 of the card billing address
+                        street_line_2:
+                          type: string
+                          description: The street line 2 of the card billing address
+                        zip_code:
+                          type: string
+                          description: The zip code of the card billing address
+                  next_cursor_id:
+                    type: string
+                    description: The next cursor ID, for resuming a paginated query
+                  has_next_page:
+                    type: boolean
+                    description: Whether the paginated query has additional pages (value may be null if no there are no additional pages)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1Cards
+      x-operation-id-source: derived
+    post:
+      tags:
+      - Cards
+      summary: Create a Card for a User
+      servers:
+      - url: https://secure.api-sandbox.astra.finance
+        description: Secure Sandbox URL
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Cards can be created directly through the API using this PCI-compliant endpoint.
+
+
+        Cards can also be created through the OAuth Module by selecting the **Connect New Debit Card** button.
+
+
+        Astra authorizes the card with the issuer before returning it. When the issuer refuses the card, the response is a `400` carrying `embedded_error.code` of `card_authorization_declined`, and the same card will be refused again. When no decision was reached about the card, the response is a `429` with `card_authorization_throttled` or a `503` with `card_authorization_unavailable`, and the same request can be retried.
+
+
+        Cards on Discover, Diners Club, UnionPay, Maestro and private-label networks, whose card numbers begin with 6, require an enhanced client configuration. A card on one of these networks is rejected with a `403` for clients without it. Please contact customer support if you are interested in accepting them.
+
+
+        For Unit customers, please reference their technical documentation below to learn more about enabling card to card payments. Enabling Card to Card Payments with Unit & Astra
+
+
+        > ❗️ This resource requires the use of the secure endpoint.
+
+        >
+
+        > | Environment | Secure Endpoint |
+
+        > |-------------|---------------------------------------------------|
+
+        > | Production | https://secure.api.astra.finance/v1/cards |
+
+        > | Sandbox | https://secure.api-sandbox.astra.finance/v1/cards |'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                card_number:
+                  type: string
+                  description: The card number the User
+                card_security_code:
+                  type: string
+                  description: The card security code
+                expiration_date:
+                  type: string
+                  description: The card expiration date
+                first_name:
+                  type: string
+                  description: The card owner's first name
+                last_name:
+                  type: string
+                  description: The card owner's last name
+                street_line_1:
+                  type: string
+                  description: The street line 1 of the card billing address
+                street_line_2:
+                  type: string
+                  description: The street line 2 of the card billing address
+                city:
+                  type: string
+                  description: The city of the card billing address
+                state:
+                  type: string
+                  description: The US State of the card billing address
+                zip_code:
+                  type: string
+                  description: The zip code of the card billing address
+                added_by_user:
+                  type: boolean
+                  description: Set to `false` for client-issued debit cards. Set to `true` for externally linked debit cards. Defaults to `false` if not provided
+              required:
+              - card_number
+              - card_security_code
+              - expiration_date
+              - first_name
+              - last_name
+              - street_line_1
+              - city
+              - state
+              - zip_code
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique card ID
+                  active:
+                    type: boolean
+                    description: Whether or not the card is active with the issuing bank
+                  address_verified:
+                    type: boolean
+                    description: AVS response from debit networks
+                  card_company:
+                    type: string
+                    description: Name of card company
+                  card_fingerprint:
+                    type: string
+                    description: A unique identifier derived from the card number
+                  card_type:
+                    type: string
+                    description: The type of card
+                    enum:
+                    - debit
+                    - prepaid
+                    - credit
+                    - unknown
+                  city:
+                    type: string
+                    description: The city of the card billing address
+                  created:
+                    type: string
+                    format: date-time
+                    description: Date and time of card creation
+                  expiration_date:
+                    type: string
+                    description: Month/Year of card expiration
+                  first_name:
+                    type: string
+                    description: The first name of card user
+                  first_six_digits:
+                    type: string
+                    description: The provided Bank Identification Number (BIN)
+                  last_four_digits:
+                    type: string
+                    description: Last 4 digits of the card number
+                  last_name:
+                    type: string
+                    description: The last name of card user
+                  name_verification_result:
+                    type: string
+                    description: The ANI results from the issuing bank of the card
+                    enum:
+                    - Match
+                    - No Match
+                    - Partial Match
+                    - Unknown
+                  product_type:
+                    type: string
+                    description: The product type of the card
+                    enum:
+                    - Consumer
+                    - Business
+                    - Commercial
+                    - Unknown
+                  pull_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for pull transactions
+                  push_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for push transactions
+                  aft_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a source in routines.
+                  oct_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a desetination in routines.
+                  removed:
+                    type: boolean
+                    description: Whether or not the user has removed the card
+                  review_reasons:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: The review reason code (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                        description:
+                          type: string
+                          description: The review reason description (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                  reviewed_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the Card was reviewed
+                  review_status:
+                    type: string
+                    description: (Deprecated) Review status of the card
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                  state:
+                    type: string
+                    description: Card address state
+                  status:
+                    type: string
+                    description: The status of the card ([Card Statuses](https://docs.astra.finance/reference/card-review-statuses#card-statuses))
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                    - removed
+                  street_line_1:
+                    type: string
+                    description: The street line 1 of the card billing address
+                  street_line_2:
+                    type: string
+                    description: The street line 2 of the card billing address
+                  zip_code:
+                    type: string
+                    description: The zip code of the card billing address
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/validation_error'
+                - $ref: '#/components/schemas/card_authorization_error'
+              examples:
+                missing_required_field:
+                  summary: Missing Field Errors
+                  value:
+                    status_code: 400
+                    description:
+                    - card_number: Please provide a card_number.
+                    - card_security_code: Please provide a card_security_code.
+                    - street_line_1: Missing data for required field.
+                    - city: Missing data for required field.
+                    - state: Missing data for required field.
+                    - zip_code: Missing data for required field.
+                first_name_validation:
+                  summary: first_name Validation
+                  value:
+                    status_code: 400
+                    description:
+                    - first_name:
+                      - First name must be at least two characters.
+                      - First name must be forty characters or less.
+                      - First name contains invalid characters.
+                last_name_validation:
+                  summary: last_name Validation
+                  value:
+                    status_code: 400
+                    description:
+                    - last_name:
+                      - Last name must be at least two characters.
+                      - Last name must be forty characters or less.
+                      - Last name contains invalid characters.
+                invalid_expiration_date:
+                  summary: Invalid Expiration Date
+                  value:
+                    status_code: 400
+                    description:
+                    - expiration_date: Expiration date is invalid.
+                invalid_oauth_client:
+                  summary: Invalid OAuth Client
+                  value:
+                    status_code: 400
+                    description:
+                    - oauth_client_id_created_by: OAuth Client is invalid.
+                card_authorization_declined:
+                  summary: Card Declined by the Issuer
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: This card could not be authorized. Check the card details or use a different card.
+                    embedded_error:
+                      code: card_authorization_declined
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                blacklisted_card:
+                  summary: Blacklisted Card
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: This card is not authorized for use.
+                max_cards:
+                  summary: Maximum Card Limit Per User
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: User has reached allowed debit card limit.
+                unsupported_network:
+                  summary: Card Network Not Enabled
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: This card network is not supported at this time.
+        '429':
+          description: Too Many Requests
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/card_authorization_error'
+              examples:
+                card_authorization_throttled:
+                  summary: Card Authorization Throttled
+                  value:
+                    code: 429
+                    name: Too Many Requests
+                    description: Card authorization is temporarily unavailable. Retry shortly.
+                    embedded_error:
+                      code: card_authorization_throttled
+        '500':
+          description: Internal Server Error
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+        '503':
+          description: Service Unavailable
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/card_authorization_error'
+              examples:
+                card_authorization_unavailable:
+                  summary: Card Authorization Unavailable
+                  value:
+                    code: 503
+                    name: Service Unavailable
+                    description: Card authorization is temporarily unavailable. Retry shortly.
+                    embedded_error:
+                      code: card_authorization_unavailable
+      operationId: postV1Cards
+      x-operation-id-source: derived
+  /v1/cards/{id}:
+    get:
+      tags:
+      - Cards
+      summary: Get a Card by an ID
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint retrieves a specific Debit Card for a User based on the unique Card ID.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of the Card
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique card ID
+                  active:
+                    type: boolean
+                    description: Whether or not the card is active with the issuing bank
+                  address_verified:
+                    type: boolean
+                    description: AVS response from debit networks
+                  card_company:
+                    type: string
+                    description: Name of card company
+                  card_fingerprint:
+                    type: string
+                    description: A unique identifier derived from the card number
+                  card_type:
+                    type: string
+                    description: The type of card
+                    enum:
+                    - debit
+                    - prepaid
+                    - credit
+                    - unknown
+                  city:
+                    type: string
+                    description: The city of the card billing address
+                  created:
+                    type: string
+                    format: date-time
+                    description: Date and time of card creation
+                  expiration_date:
+                    type: string
+                    description: Month/Year of card expiration
+                  first_name:
+                    type: string
+                    description: The first name of card user
+                  first_six_digits:
+                    type: string
+                    description: The provided Bank Identification Number (BIN)
+                  last_four_digits:
+                    type: string
+                    description: Last 4 digits of the card number
+                  last_name:
+                    type: string
+                    description: The last name of card user
+                  name_verification_result:
+                    type: string
+                    description: The ANI results from the issuing bank of the card
+                    enum:
+                    - Match
+                    - No Match
+                    - Partial Match
+                    - Unknown
+                  product_type:
+                    type: string
+                    description: The product type of the card
+                    enum:
+                    - Consumer
+                    - Business
+                    - Commercial
+                    - Unknown
+                  pull_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for pull transactions
+                  push_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for push transactions
+                  aft_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a source in routines.
+                  oct_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a desetination in routines.
+                  removed:
+                    type: boolean
+                    description: Whether or not the user has removed the card
+                  review_reasons:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: The review reason code (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                        description:
+                          type: string
+                          description: The review reason description (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                  reviewed_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the Card was reviewed
+                  review_status:
+                    type: string
+                    description: (Deprecated) Review status of the card
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                  state:
+                    type: string
+                    description: Card address state
+                  status:
+                    type: string
+                    description: The status of the card ([Card Statuses](https://docs.astra.finance/reference/card-review-statuses#card-statuses))
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                    - removed
+                  street_line_1:
+                    type: string
+                    description: The street line 1 of the card billing address
+                  street_line_2:
+                    type: string
+                    description: The street line 2 of the card billing address
+                  zip_code:
+                    type: string
+                    description: The zip code of the card billing address
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1CardsById
+      x-operation-id-source: derived
+    delete:
+      tags:
+      - Cards
+      summary: Delete a Card
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint deletes a debit card by way of a card''s unique ID. If the card is successfully deleted, you''ll receive an HTTP 200 OK response.
+
+
+        > 🚧
+
+        >
+
+        > Astra will only delete cards that were added by the requesting OAuth Client. End-users can delete cards through the Web App.
+
+
+        > ❗️
+
+        >
+
+        > A card can only be deleted if there are no active routines or pending transfers associated with it.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of the Card
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: deleteV1CardsById
+      x-operation-id-source: derived
+  /v1/cards/{id}/approve:
+    post:
+      tags:
+      - Cards
+      summary: Approve a Card by an ID
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint gives eligible clients the ability to approve a flagged Card by way of the card''s unique ID.
+
+
+        > 🚧
+
+        >
+
+        > Your Astra OAuth Client must be enabled for this resource. Only flagged Cards can be approved, and the User must be approved in order to have their card(s) actioned.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of the Card
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique card ID
+                  active:
+                    type: boolean
+                    description: Whether or not the card is active with the issuing bank
+                  address_verified:
+                    type: boolean
+                    description: AVS response from debit networks
+                  aft_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a source in routines.
+                  card_company:
+                    type: string
+                    description: Name of card company
+                  card_fingerprint:
+                    type: string
+                    description: A unique identifier derived from the card number
+                  card_type:
+                    type: string
+                    description: The type of card
+                    enum:
+                    - debit
+                    - prepaid
+                    - credit
+                    - unknown
+                  city:
+                    type: string
+                    description: The city of the card billing address
+                  country:
+                    type: string
+                    description: The country of the card billing address
+                  created:
+                    type: string
+                    format: date-time
+                    description: Date and time of card creation
+                  expiration_date:
+                    type: string
+                    description: Month/Year of card expiration
+                  first_name:
+                    type: string
+                    description: The first name of card user
+                  first_six_digits:
+                    type: string
+                    description: The provided Bank Identification Number (BIN)
+                  interchange_category:
+                    type: string
+                    description: The interchange category of the card
+                  last_four_digits:
+                    type: string
+                    description: Last 4 digits of the card number
+                  last_name:
+                    type: string
+                    description: The last name of card user
+                  name_verification_result:
+                    type: string
+                    description: The ANI results from the issuing bank of the card
+                    enum:
+                    - Match
+                    - No Match
+                    - Partial Match
+                    - Unknown
+                  oct_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a destination in routines.
+                  product_type:
+                    type: string
+                    description: The product type of the card
+                    enum:
+                    - Consumer
+                    - Business
+                    - Commercial
+                    - Unknown
+                  pull_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for pull transactions
+                  push_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for push transactions
+                  removed:
+                    type: boolean
+                    description: Whether or not the user has removed the card
+                  review_reasons:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: The review reason code (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                        description:
+                          type: string
+                          description: The review reason description (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                  review_status:
+                    type: string
+                    description: (Deprecated) Review status of the card
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                  reviewed_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the Card was reviewed
+                  state:
+                    type: string
+                    description: Card address state
+                  status:
+                    type: string
+                    description: The status of the card ([Card Statuses](https://docs.astra.finance/reference/card-review-statuses#card-statuses))
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                    - removed
+                  street_line_1:
+                    type: string
+                    description: The street line 1 of the card billing address
+                  street_line_2:
+                    type: string
+                    description: The street line 2 of the card billing address
+                  user_id:
+                    type: string
+                    description: The unique ID of the User the card belongs to
+                  zip_code:
+                    type: string
+                    description: The zip code of the card billing address
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                not_flagged:
+                  summary: Card is not flagged
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Only flagged cards can be approved.
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                client_not_enabled:
+                  summary: Client is not enabled for API card review
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: Client is not enabled for API card review.
+                card_not_associated:
+                  summary: Card belongs to a different client
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: Card is not associated with client.
+        '404':
+          description: Not Found
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                card_not_found:
+                  summary: Card not found for the provided user and card
+                  value:
+                    code: 404
+                    name: Not Found
+                    description: Card not found for user id <id> and card id <id>.
+      operationId: postV1CardsByIdApprove
+      x-operation-id-source: derived
+  /v1/cards/{id}/auth_details:
+    get:
+      tags:
+      - Cards
+      summary: Get Smart Card Authorization by Card ID
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint returns card authorization risk assessment and recommendation data for a given user''s card.
+
+
+        > 🚧
+
+        >
+
+        > This endpoint requires an enhanced client configuration for smart card authorization. Please contact customer support if you are interested in this feature.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of the Card
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  risk_factors:
+                    type: object
+                    properties:
+                      blacklisted:
+                        type: boolean
+                        description: Whether or not the card has been blacklisted by Astra
+                      address:
+                        type: object
+                        properties:
+                          verified:
+                            type: boolean
+                            description: Whether or not the card's address could be verified by the network
+                          zip_match:
+                            type: boolean
+                            description: Whether or not the card's zip code matches the user's profile
+                      user:
+                        type: object
+                        properties:
+                          age_risk:
+                            type: string
+                            description: Risk level based on the user's DOB relative to the card details
+                            enum:
+                            - low
+                            - high
+                          profile_risk:
+                            type: string
+                            description: Risk level based on the user's entire profile
+                            enum:
+                            - very-low
+                            - low
+                            - medium
+                            - high
+                            - very-high
+                          phone_correlation_risk:
+                            type: string
+                            description: Risk level based on correlation between the user and their phone
+                            enum:
+                            - very-low
+                            - low
+                            - medium
+                            - high
+                            - very-high
+                          email_correlation_risk:
+                            type: string
+                            description: Risk level based on correlation between the user and their email
+                            enum:
+                            - very-low
+                            - low
+                            - medium
+                            - high
+                            - very-high
+                          first_name_match_risk:
+                            type: string
+                            description: Risk level based on how correlated the card's first name matches the user's profile
+                            enum:
+                            - low
+                            - high
+                          last_name_match_risk:
+                            type: string
+                            description: Risk level based on how correlated the card's last name matches the user's profile
+                            enum:
+                            - low
+                            - high
+                  auto_approval_recommendation:
+                    type: string
+                    description: A recommendation for action based on best-in-class security analysis of key data points
+                    enum:
+                    - approve
+                    - pending
+                    - reject
+                    - review
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                client_requires_config:
+                  summary: Client Requires Configuration
+                  value:
+                    code: 401
+                    name: Unauthorized
+                    description: Card auth details functionality requires manual configuration by an Astra administrator.
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '404':
+          description: Not Found
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                client_requires_config:
+                  summary: Card ID Not Found For User
+                  value:
+                    code: 404
+                    name: Not Found
+                    description: Card not found.
+      operationId: getV1CardsByIdAuthDetails
+      x-operation-id-source: derived
+  /v1/cards/{id}/reject:
+    post:
+      tags:
+      - Cards
+      summary: Reject a Card by an ID
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint gives eligible clients the ability to reject a flagged Card by way of the card''s unique ID.
+
+
+        > 🚧
+
+        >
+
+        > Your Astra OAuth Client must be enabled for this resource. Only flagged Cards can be rejected, and the User must be approved in order to have their card(s) actioned.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The unique ID of the Card
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique card ID
+                  active:
+                    type: boolean
+                    description: Whether or not the card is active with the issuing bank
+                  address_verified:
+                    type: boolean
+                    description: AVS response from debit networks
+                  aft_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a source in routines.
+                  card_company:
+                    type: string
+                    description: Name of card company
+                  card_fingerprint:
+                    type: string
+                    description: A unique identifier derived from the card number
+                  card_type:
+                    type: string
+                    description: The type of card
+                    enum:
+                    - debit
+                    - prepaid
+                    - credit
+                    - unknown
+                  city:
+                    type: string
+                    description: The city of the card billing address
+                  country:
+                    type: string
+                    description: The country of the card billing address
+                  created:
+                    type: string
+                    format: date-time
+                    description: Date and time of card creation
+                  expiration_date:
+                    type: string
+                    description: Month/Year of card expiration
+                  first_name:
+                    type: string
+                    description: The first name of card user
+                  first_six_digits:
+                    type: string
+                    description: The provided Bank Identification Number (BIN)
+                  interchange_category:
+                    type: string
+                    description: The interchange category of the card
+                  last_four_digits:
+                    type: string
+                    description: Last 4 digits of the card number
+                  last_name:
+                    type: string
+                    description: The last name of card user
+                  name_verification_result:
+                    type: string
+                    description: The ANI results from the issuing bank of the card
+                    enum:
+                    - Match
+                    - No Match
+                    - Partial Match
+                    - Unknown
+                  oct_enabled:
+                    type: boolean
+                    description: If true, this card is allowed to be used as a destination in routines.
+                  product_type:
+                    type: string
+                    description: The product type of the card
+                    enum:
+                    - Consumer
+                    - Business
+                    - Commercial
+                    - Unknown
+                  pull_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for pull transactions
+                  push_enabled:
+                    type: boolean
+                    description: Whether or not the card is enabled for push transactions
+                  removed:
+                    type: boolean
+                    description: Whether or not the user has removed the card
+                  review_reasons:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: The review reason code (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                        description:
+                          type: string
+                          description: The review reason description (see [Card Review Reasons](https://docs.astra.finance/reference/card-review-statuses#review-reasons))
+                  review_status:
+                    type: string
+                    description: (Deprecated) Review status of the card
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                  reviewed_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the Card was reviewed
+                  state:
+                    type: string
+                    description: Card address state
+                  status:
+                    type: string
+                    description: The status of the card ([Card Statuses](https://docs.astra.finance/reference/card-review-statuses#card-statuses))
+                    enum:
+                    - approved
+                    - flagged
+                    - rejected
+                    - removed
+                  street_line_1:
+                    type: string
+                    description: The street line 1 of the card billing address
+                  street_line_2:
+                    type: string
+                    description: The street line 2 of the card billing address
+                  user_id:
+                    type: string
+                    description: The unique ID of the User the card belongs to
+                  zip_code:
+                    type: string
+                    description: The zip code of the card billing address
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                not_flagged:
+                  summary: Card is not flagged
+                  value:
+                    code: 400
+                    name: Bad Request
+                    description: Only flagged cards can be rejected.
+        '403':
+          description: Forbidden
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                client_not_enabled:
+                  summary: Client is not enabled for API card review
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: Client is not enabled for API card review.
+                card_not_associated:
+                  summary: Card belongs to a different client
+                  value:
+                    code: 403
+                    name: Forbidden
+                    description: Card is not associated with client.
+        '404':
+          description: Not Found
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                card_not_found:
+                  summary: Card not found for the provided user and card
+                  value:
+                    code: 404
+                    name: Not Found
+                    description: Card not found for user id <id> and card id <id>.
+      operationId: postV1CardsByIdReject
+      x-operation-id-source: derived
+components:
+  examples:
+    generic_error_unauthorized:
+      summary: Invalid or Expired Access Token
+      value:
+        code: 401
+        name: Unauthorized
+        description: null
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  schemas:
+    card_authorization_error:
+      allOf:
+      - $ref: '#/components/schemas/generic_error'
+      - type: object
+        properties:
+          embedded_error:
+            type: object
+            properties:
+              code:
+                type: string
+                description: Why Astra could not authorize the card. Returned by `POST /v1/cards`.
+                enum:
+                - card_authorization_declined
+                - card_authorization_throttled
+                - card_authorization_unavailable
+    validation_error:
+      type: object
+      properties:
+        status_code:
+          description: HTTP Response code
+          type: integer
+        description:
+          description: Object of invalid fields with accompanying descriptions
+          type: object
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

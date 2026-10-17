@@ -1,0 +1,829 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Transfers API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Transfers
+paths:
+  /v1/batch_transfers/{id}:
+    get:
+      tags:
+      - Transfers
+      summary: Get a Specific Batch Transfer
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        Retrieve Batch Transfer data for a specific Batch Transfer.'
+      security:
+      - basicAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The Batch Transfer ID
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the Batch Transfer
+                  addenda:
+                    type: string
+                    description: The addenda of the ACH debit/credit associated with this batch transfer
+                  amount:
+                    type: integer
+                    description: The amount in cents
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date and time the Batch Transfer was created
+                  failure_reason:
+                    type: string
+                    description: The reason that the Batch Transfer was not successful (null if no failure)
+                  item_count:
+                    type: number
+                    description: The number of Transfers associated with the Batch
+                  item_type:
+                    type: string
+                    description: The type of Batch Transfer
+                    enum:
+                    - ach_transfer
+                    - debit_chargeback
+                    - interchange_network_fees
+                  preliminary_amount:
+                    type: integer
+                    description: The preliminary amount in cents
+                  processing_scheduled_at:
+                    type: string
+                    format: date-time
+                    description: The date and time when the Batch Transfer is scheduled to run
+                  source_id:
+                    type: string
+                    description: The source account unique identifier
+                  source_inst:
+                    type: string
+                    description: The source account institution
+                  source_mask:
+                    type: string
+                    description: The source account number mask
+                  source_name:
+                    type: string
+                    description: The source account name
+                  source_type:
+                    type: string
+                    description: The source account type
+                  status:
+                    type: string
+                    description: The status of the Batch Transfer
+                    enum:
+                    - open
+                    - processing
+                    - failed
+                    - canceled
+                    - completed
+                  transfer_type:
+                    type: string
+                    description: The type of transfer
+                  updated:
+                    type: string
+                    format: date-time
+                    description: The date and time when the Batch Transfer was last updated
+                  user_email:
+                    type: string
+                    description: The email address of the User associated with the Batch Transfer
+                  user_id:
+                    type: string
+                    description: The User ID associated with the Batch Transfer
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+        '404':
+          description: Not Found
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+              examples:
+                not_found:
+                  summary: Batch Transfer not found
+                  value:
+                    code: 404
+                    name: Not Found
+                    description: Batch transfer not found.
+      operationId: getV1BatchTransfersById
+      x-operation-id-source: derived
+  /v1/transfers:
+    get:
+      tags:
+      - Transfers
+      summary: List Transfers for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Retrieve all Transfers for a User.
+
+
+        > 📘
+
+        >
+
+        > This resource returns paginated results in descending order. For more details please see: Pagination'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: status
+        in: query
+        description: The status of the Transfer (pending, cancelled, processed, failed)
+        schema:
+          type: string
+        required: false
+      - name: source_id
+        in: query
+        description: The ID of the source account
+        schema:
+          type: string
+        required: false
+      - name: page_size
+        in: query
+        description: The maximum number of items returned with each request.  Defaults to 25 if not specified.
+        schema:
+          type: integer
+          minimum: 10
+          maximum: 100
+        required: false
+      - name: cursor_id
+        in: query
+        description: The pagination cursor ID.  When specified, allows one to navigate between pages.  If not specified the first page of results will be returned.
+        schema:
+          type: string
+        required: false
+      - name: batch_id
+        in: query
+        description: The Batch Transfer ID (required if specifying `batch_type`)
+        schema:
+          type: string
+        required: false
+      - name: batch_type
+        in: query
+        description: The Batch Transfer Type (required if specifying `batch_id`)
+        schema:
+          type: string
+          enum:
+          - credit
+          - debit
+        required: false
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The number of transfers returned
+                  transfers:
+                    type: array
+                    items:
+                      schema: null
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique ID of the transfer
+                        routine_type:
+                          type: string
+                          description: The type of routine associated with the transfer
+                          enum:
+                          - one-time
+                          - recurring
+                        routine_name:
+                          type: string
+                          description: The name of the routine associated with the transfer
+                        routine_id:
+                          type: string
+                          description: The unique ID of the routine associated with the transfer
+                        client_correlation_id:
+                          type: string
+                          description: An optional correlation id that will be added to ACH or Debit Addenda. This will also be included in the Transfer response.
+                        source_id:
+                          type: string
+                          description: The ID of the Source Account
+                        destination_id:
+                          type: string
+                          description: The ID of the Destination Account
+                        destination_user_id:
+                          type: string
+                          description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                        amount:
+                          type: number
+                          format: float
+                          description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                        payment_type:
+                          type: string
+                          description: The type of payment
+                          enum:
+                          - ach
+                          - debit
+                          - ledger
+                        initiated:
+                          type: string
+                          format: date-time
+                          description: The date and time the transfer was initiated
+                        net_credit_batch_id:
+                          type: string
+                          description: The Net Credit Batch Transfer ID associated with this transfer
+                        net_debit_batch_id:
+                          type: string
+                          description: The Net Debit Batch Transfer ID associated with this transfer
+                        updated:
+                          type: string
+                          format: date-time
+                          description: The date and time the transfer was updated
+                        estimated_clearing_date:
+                          type: string
+                          format: date-time
+                          description: The estimated date and time the transfer will clear
+                        astra_settlement_reason:
+                          type: string
+                          description: The reason that an estimated settlement date may have been changed
+                        failure_reason:
+                          type: string
+                          description: The reason that astra transfer was not successful
+                        status:
+                          type: string
+                          description: The status of the Transfer
+                          enum:
+                          - pending
+                          - processed
+                          - cancelled
+                          - failed
+                        ultimate_receiver_id:
+                          type: string
+                          description: The User ID of the ultimate receiver of the Transfer
+                        ultimate_sender_id:
+                          type: string
+                          description: The User ID of the ultimate sender of the Transfer
+                  next_cursor_id:
+                    type: string
+                    description: The next cursor ID, for resuming a paginated query
+                  has_next_page:
+                    type: boolean
+                    description: Whether the paginated query has additional pages (value may be null if no there are no additional pages)
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1Transfers
+      x-operation-id-source: derived
+  /v1/transfers/{id}:
+    get:
+      tags:
+      - Transfers
+      summary: Get a Specific Transfer for a User
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        This endpoint retrieves a specific Transfer for a User based on the Transfer ID.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The Transfer ID
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the transfer
+                  routine_type:
+                    type: string
+                    description: The type of routine associated with the transfer
+                    enum:
+                    - one-time
+                    - recurring
+                  routine_name:
+                    type: string
+                    description: The name of the routine associated with the transfer
+                  routine_id:
+                    type: string
+                    description: The unique ID of the routine associated with the transfer
+                  client_correlation_id:
+                    type: string
+                    description: An optional correlation id that will be added to ACH or Debit Addenda. This will also be included in the Transfer response.
+                  source_id:
+                    type: string
+                    description: The ID of the Source Account
+                  destination_id:
+                    type: string
+                    description: The ID of the Destination Account
+                  destination_user_id:
+                    type: string
+                    description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                  payment_type:
+                    type: string
+                    description: The type of payment
+                    enum:
+                    - ach
+                    - debit
+                    - ledger
+                  initiated:
+                    type: string
+                    format: date-time
+                    description: The date and time the transfer was initiated
+                  net_credit_batch_id:
+                    type: string
+                    description: The Net Credit Batch Transfer ID associated with this transfer
+                  net_debit_batch_id:
+                    type: string
+                    description: The Net Debit Batch Transfer ID associated with this transfer
+                  updated:
+                    type: string
+                    format: date-time
+                    description: The date and time the transfer was updated
+                  estimated_clearing_date:
+                    type: string
+                    format: date-time
+                    description: The estimated date and time the transfer will clear
+                  astra_settlement_reason:
+                    type: string
+                    description: The reason that an estimated settlement date may have been changed
+                  failure_reason:
+                    type: string
+                    description: The reason that astra transfer was not successful
+                  chargeback:
+                    type: object
+                    description: A chargeback object associated with the transfer (if transfer was disputed)
+                    properties:
+                      action_status:
+                        type: string
+                        description: The current status of the chargeback. [(See Chargeback Statuses)](https://docs.astra.finance/reference/chargeback-webhooks#chargeback-statuses)
+                      cb_id:
+                        type: string
+                        description: The unique chargeback ID
+                      created:
+                        type: string
+                        format: date-time
+                        description: The date-time when the Astra chargeback record was created
+                      dispute_status:
+                        type: string
+                        description: The current status of the dispute. [(See Dispute Statuses)](https://docs.astra.finance/reference/chargeback-webhooks#chargeback-dispute-statuses)
+                        enum:
+                        - Not Disputed
+                        - Open
+                        - Won
+                        - Lost
+                      exception_code:
+                        type: string
+                        description: The chargeback exception code
+                      exception_date:
+                        type: string
+                        format: date
+                        description: The date the chargeback was filed with the user's financial institution
+                      exception_description:
+                        type: string
+                        description: The description of the chargeback exception code
+                      exception_id:
+                        type: string
+                        description: The unique exception ID
+                      exception_settled_amount:
+                        type: number
+                        format: float
+                        description: The amount (in cents) of funds claimed in the chargeback
+                      exception_type:
+                        type: string
+                        description: The current exception type (CHARGEBACK or REPRESENTMENT)
+                      merchant_reference_id:
+                        type: string
+                        description: The merchant reference ID
+                      network_id:
+                        type: string
+                        description: The network ID
+                      original_creation_date:
+                        type: string
+                        format: date
+                        description: The date the related transfer was created
+                      original_processed_date:
+                        type: string
+                        format: date
+                        description: The date the related transfer was processed
+                      original_settled_amount:
+                        type: number
+                        format: float
+                        description: The amount (in cents) of funds moved by the transfer
+                      status_date:
+                        type: string
+                        format: date
+                        description: The date of the most recent status update
+                      updated:
+                        type: string
+                        format: date-time
+                        description: The date-time the chargeback was updated
+                      user_id:
+                        type: string
+                        description: The Astra user ID associated with the chargeback
+                      ultimate_receiver_id:
+                        type: string
+                        description: The User ID of the ultimate receiver of the Transfer
+                      ultimate_sender_id:
+                        type: string
+                        description: The User ID of the ultimate sender of the Transfer
+                  status:
+                    type: string
+                    description: The status of the Transfer
+                    enum:
+                    - pending
+                    - processed
+                    - cancelled
+                    - failed
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1TransfersById
+      x-operation-id-source: derived
+  /v1/transfers/{id}/cancel:
+    post:
+      tags:
+      - Transfers
+      summary: Cancel Transfer
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Cancel a transfer for a user. To cancel a transfer, you must provide the ID of the transfer in the Endpoint URL. When a transfer is successfully canceled, Astra will return a successful response (HTTP 200) and the status of the transfer in the Transfer table will update to `canceled`.
+
+
+        > 🚧
+
+        >
+
+        > If the API response states that the transfer cannot be cancelled, then it indeed cannot be cancelled by any means. For details see this guide.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The ID of the Transfer to cancel
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the transfer
+                  routine_type:
+                    type: string
+                    description: The type of routine associated with the transfer
+                    enum:
+                    - one-time
+                    - recurring
+                  routine_name:
+                    type: string
+                    description: The name of the routine associated with the transfer
+                  routine_id:
+                    type: string
+                    description: The unique ID of the routine associated with the transfer
+                  client_correlation_id:
+                    type: string
+                    description: An optional correlation id that will be added to ACH or Debit Addenda. This will also be included in the Transfer response.
+                  source_id:
+                    type: string
+                    description: The ID of the Source Account
+                  destination_id:
+                    type: string
+                    description: The ID of the Destination Account
+                  destination_user_id:
+                    type: string
+                    description: The User ID associated with the Destination Account (required if the destination_id does not belong to the authenticating User)
+                  amount:
+                    type: number
+                    format: float
+                    description: The amount of the transfer (when explicitly defined like one-time or recurring)
+                  payment_type:
+                    type: string
+                    description: The type of payment
+                    enum:
+                    - ach
+                    - debit
+                    - ledger
+                  initiated:
+                    type: string
+                    format: date-time
+                    description: The date and time the transfer was initiated
+                  updated:
+                    type: string
+                    format: date-time
+                    description: The date and time the transfer was updated
+                  estimated_clearing_date:
+                    type: string
+                    format: date-time
+                    description: The estimated date and time the transfer will clear
+                  status:
+                    type: string
+                    description: The status of the Transfer
+                    enum:
+                    - cancelled
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: postV1TransfersByIdCancel
+      x-operation-id-source: derived
+  /v1/transfers/{id}/segments:
+    get:
+      tags:
+      - Transfers
+      summary: Get Details on the Segments of a Transfer
+      description: '> 📘
+
+        >
+
+        > You can place the bearer `access_token` for a specific user into the Authentication section of this documentation 👉.
+
+
+        Retrieve Transfer Segment data for a specific Transfer. Segments reveal details on each leg of a Transfer.'
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: The Transfer ID
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  segments:
+                    type: array
+                    description: List of Segments for a Transfer
+                  transfers:
+                    type: array
+                    items:
+                      schema: null
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The unique ID of the Segment
+                        amount:
+                          type: number
+                          format: float
+                          description: The amount in dollars
+                        created:
+                          type: string
+                          format: date-time
+                          description: The date and time the Segment was created
+                        direction:
+                          type: string
+                          description: The direction of the money movement
+                          enum:
+                          - pull
+                          - push
+                          - inbound
+                          - outbound
+                        estimated_settlement_date:
+                          type: string
+                          format: date
+                          description: The estimated settlement date for ACH rail Segments (null value for AFT/OCT type Segments)
+                        failure_reason:
+                          type: string
+                          description: The failure reason for the Segment (default null)
+                        rail:
+                          type: string
+                          description: The payment rail used for the Segment
+                          enum:
+                          - mastercard
+                          - visa
+                          - ach
+                          - rtp
+                          - fednow
+                        status:
+                          type: string
+                          description: The status of the Segment
+                          enum:
+                          - pending
+                          - processed
+                          - failed
+                          - rejected
+                        trace_number:
+                          type: string
+                          description: The trace number of the Segment
+                        type:
+                          type: string
+                          description: The Segment type
+                          enum:
+                          - aft
+                          - oct
+                          - debit
+                          - credit
+        '401':
+          description: Unauthorized
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
+              examples:
+                generic_error_unauthorized:
+                  $ref: '#/components/examples/generic_error_unauthorized'
+      operationId: getV1TransfersByIdSegments
+      x-operation-id-source: derived
+components:
+  examples:
+    generic_error_unauthorized:
+      summary: Invalid or Expired Access Token
+      value:
+        code: 401
+        name: Unauthorized
+        description: null
+  schemas:
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0

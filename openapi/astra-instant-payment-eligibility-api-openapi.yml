@@ -1,0 +1,215 @@
+openapi: 3.2.0
+info:
+  title: Astra Developer Instant Payment Eligibility API
+  description: Astra's public API endpoints available to our customers.
+  version: 1.0.0
+servers:
+- url: https://api-sandbox.astra.finance
+  description: Sandbox Environment
+- url: https://secure.api-sandbox.astra.finance
+  description: Secure Sandbox URL
+tags:
+- name: Instant Payment Eligibility
+paths:
+  /v1/instant-payment-eligibility:
+    get:
+      tags:
+      - Instant Payment Eligibility
+      summary: Get Account Routing Number Instant Payment Eligibility
+      description: '> 📘
+
+        >
+
+        > You can place your application''s `client_id` into the `username` field, and your `client_secret` into the `password` form field of the Authentication section of this documentation 👉.
+
+
+        Use this endpoint to check if an account is eligible for instant payments.'
+      security:
+      - basicAuth: []
+      parameters:
+      - name: routing_number
+        in: query
+        description: The routing number of the account
+        required: false
+        schema:
+          type: string
+      - name: institution_routing_number
+        in: query
+        description: The institution routing number
+        required: false
+        schema:
+          type: string
+      - name: participant_id
+        in: query
+        description: Identification number assigned to a participant in the payment network
+        required: false
+        schema:
+          type: string
+      - name: cursor_id
+        in: query
+        description: The pagination cursor ID.  When specified, allows one to navigate between pages.  If not specified the first page of results will be returned.
+        required: false
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: The maximum number of items returned with each request.  Defaults to 25 if not specified.
+        required: false
+        schema:
+          type: integer
+          minimum: 10
+          maximum: 100
+      responses:
+        '200':
+          description: Successfully retrieved instant payment eligibility information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    description: List of routing number records
+                    items:
+                      type: object
+                      properties:
+                        institution_routing_number:
+                          type: string
+                          description: The routing number of the institution
+                        name:
+                          type: string
+                          description: Name of the financial institution
+                        network_platform:
+                          type: string
+                          description: The payment network platform
+                          enum:
+                          - FedNow
+                          - TCH
+                        online_status:
+                          type: string
+                          description: Current online status
+                          enum:
+                          - SignedOn
+                          - SignedOff
+                        participant_id:
+                          type: string
+                          description: Identification number assigned to a participant in the payment network
+                        receive_enabled:
+                          type: boolean
+                          description: Indicates if the account can receive instant payments
+                        routing_number:
+                          type: string
+                          description: The routing number of the account
+                  count:
+                    type: integer
+                    description: Total number of results returned
+                  has_next_page:
+                    type: boolean
+                    description: Indicates if there are additional results available
+                  next_cursor_id:
+                    type: string
+                    description: Cursor identifier to retrieve the next page of results
+        '400':
+          description: Bad Request
+          headers:
+            request-id:
+              $ref: '#/components/headers/request-id'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/generic_error'
+                - $ref: '#/components/schemas/validation_error'
+      operationId: getV1InstantPaymentEligibility
+      x-operation-id-source: derived
+components:
+  schemas:
+    validation_error:
+      type: object
+      properties:
+        status_code:
+          description: HTTP Response code
+          type: integer
+        description:
+          description: Object of invalid fields with accompanying descriptions
+          type: object
+    generic_error:
+      type: object
+      properties:
+        code:
+          description: Response code
+          type: integer
+        name:
+          description: Name of response code
+          type: string
+        description:
+          description: Error message
+          type: string
+  headers:
+    request-id:
+      description: Unique ID returned with each API response
+      schema:
+        type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.astra.finance/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.astra.finance/reference/delete_v1-accounts-id.md
+  - https://docs.astra.finance/reference/delete_v1-cards-id.md
+  - https://docs.astra.finance/reference/delete_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts-id.md
+  - https://docs.astra.finance/reference/get_v1-accounts.md
+  - https://docs.astra.finance/reference/get_v1-batch-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-bins-bin.md
+  - https://docs.astra.finance/reference/get_v1-business-profile-business-profile-id.md
+  - https://docs.astra.finance/reference/get_v1-cards-id-auth-details.md
+  - https://docs.astra.finance/reference/get_v1-cards-id.md
+  - https://docs.astra.finance/reference/get_v1-cards.md
+  - https://docs.astra.finance/reference/get_v1-instant-payment-eligibility.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments-id.md
+  - https://docs.astra.finance/reference/get_v1-payment-instruments.md
+  - https://docs.astra.finance/reference/get_v1-phone-number-change-requests.md
+  - https://docs.astra.finance/reference/get_v1-routines-id-transfers.md
+  - https://docs.astra.finance/reference/get_v1-routines-id.md
+  - https://docs.astra.finance/reference/get_v1-routines.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id-segments.md
+  - https://docs.astra.finance/reference/get_v1-transfers-id.md
+  - https://docs.astra.finance/reference/get_v1-transfers.md
+  - https://docs.astra.finance/reference/get_v1-user-intent-id.md
+  - https://docs.astra.finance/reference/get_v1-user.md
+  - https://docs.astra.finance/reference/get_v1-users-id-capabilities.md
+  - https://docs.astra.finance/reference/patch_v1-users-user-id.md
+  - https://docs.astra.finance/reference/post_v1-accounts-create.md
+  - https://docs.astra.finance/reference/post_v1-accounts-processor-token.md
+  - https://docs.astra.finance/reference/post_v1-business-profile.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-approve.md
+  - https://docs.astra.finance/reference/post_v1-cards-id-reject.md
+  - https://docs.astra.finance/reference/post_v1-cards.md
+  - https://docs.astra.finance/reference/post_v1-oauth-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-token.md
+  - https://docs.astra.finance/reference/post_v1-partner-identity-verification.md
+  - https://docs.astra.finance/reference/post_v1-request-address-change.md
+  - https://docs.astra.finance/reference/post_v1-request-user-phone-number-update.md
+  - https://docs.astra.finance/reference/post_v1-routines-account-to-card.md
+  - https://docs.astra.finance/reference/post_v1-routines-book.md
+  - https://docs.astra.finance/reference/post_v1-routines-card-to-account.md
+  - https://docs.astra.finance/reference/post_v1-routines-preview.md
+  - https://docs.astra.finance/reference/post_v1-routines.md
+  - https://docs.astra.finance/reference/post_v1-transfers-id-cancel.md
+  - https://docs.astra.finance/reference/post_v1-upgrade-kyc-type.md
+  - https://docs.astra.finance/reference/post_v1-user-intent.md
+  - https://docs.astra.finance/reference/put_v1-routines-id.md
+  merge:
+    pages: 45
+    deduped: 182
+    conflicts_kept_first: 0
