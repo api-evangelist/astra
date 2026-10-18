@@ -163,6 +163,8 @@ apis:
   humanURL: https://docs.astra.finance/reference/introduction
   baseURL: https://api.astra.finance/v1
   tags:
+  - Account
+  tags_raw:
   - Accounts
   properties:
   - type: OpenAPI
